@@ -174,7 +174,7 @@ namespace SerialScreen_ver1
             textBox_threshold.Text = STM32_ADC_Threshold.ToString();
 
             
-            //mca横ラベルの初期化
+            //mca横ラベルの初期化　
             label_TotalCountingTime.Text = span.ToString(@"hh\:mm\:ss");
             label_total_count_mca.Text = 0.ToString();
             label_peak_mca.Text = "横軸：" +0.ToString() + "\n縦軸：" + 0.ToString();
@@ -647,15 +647,24 @@ namespace SerialScreen_ver1
             }
 
             mca_chart_update(mca_total_buf);
+            sw.Reset();
 
         }
 
         private void btn_rx_buf_clear_Click(object sender, EventArgs e)
         {
-            int buf_left = serialPort1.BytesToRead;
-            serialPort1.DiscardInBuffer();
+            if (serialPort1.IsOpen)
+            {
+                int buf_left = serialPort1.BytesToRead;
+                serialPort1.DiscardInBuffer();
 
-            MessageBox.Show(buf_left.ToString() + "bytes is deleted");
+                MessageBox.Show(buf_left.ToString() + "bytes is deleted");
+            }
+            else
+            {
+                MessageBox.Show("シリアルポートは閉じています。");
+            }
+            
         }
 
         private void button_csv_out_Click(object sender, EventArgs e)
@@ -777,6 +786,13 @@ namespace SerialScreen_ver1
             MySerialPort sp_ = new MySerialPort(serialPort1);
             AutoSelect comAuto = new AutoSelect("stm32f4", sp_);
 
+            if (serialPort1.IsOpen == false)
+            {
+                MessageBox.Show("STM32が見つかりません。");
+                return;
+            }
+
+
             buf_settings(1000); //データ受取り数を1000byteに設定(500データ)
 
             button_close.Enabled = true;
@@ -852,6 +868,7 @@ namespace SerialScreen_ver1
 
             sw.Start();
             timer_stopwatch.Enabled = true;
+
         }
 
         private void button_MCA_OFF_Click(object sender, EventArgs e)
