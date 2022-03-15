@@ -41,18 +41,11 @@ namespace SerialScreen_ver1
             System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
             System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
-            this.button_open = new System.Windows.Forms.Button();
-            this.comboBox_com = new System.Windows.Forms.ComboBox();
             this.button_close = new System.Windows.Forms.Button();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.comboBox_cmd = new System.Windows.Forms.ComboBox();
-            this.button_send = new System.Windows.Forms.Button();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.label1 = new System.Windows.Forms.Label();
-            this.textBox_ascii = new System.Windows.Forms.TextBox();
-            this.label3 = new System.Windows.Forms.Label();
             this.panel1 = new System.Windows.Forms.Panel();
             this.comboBox_BufThresh = new System.Windows.Forms.ComboBox();
             this.label_BufTh = new System.Windows.Forms.Label();
@@ -61,11 +54,6 @@ namespace SerialScreen_ver1
             this.comboBox_rxsetting = new System.Windows.Forms.ComboBox();
             this.comboBox_baudrate = new System.Windows.Forms.ComboBox();
             this.label_setting_title = new System.Windows.Forms.Label();
-            this.comboBox_adcDisplay = new System.Windows.Forms.ComboBox();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label_adcDisplay = new System.Windows.Forms.Label();
-            this.button_ascii_delete = new System.Windows.Forms.Button();
-            this.button_hex_delete = new System.Windows.Forms.Button();
             this.button_chart_clear = new System.Windows.Forms.Button();
             this.chart_MCA = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.label_chart_res = new System.Windows.Forms.Label();
@@ -91,10 +79,6 @@ namespace SerialScreen_ver1
             this.button_adc_setting_off = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.button_csv_out = new System.Windows.Forms.Button();
-            this.checkBox_chart = new System.Windows.Forms.CheckBox();
-            this.panel3 = new System.Windows.Forms.Panel();
-            this.checkBox_hex = new System.Windows.Forms.CheckBox();
-            this.checkBox_ascii = new System.Windows.Forms.CheckBox();
             this.mcu_setting_btn = new System.Windows.Forms.Button();
             this.mcu_setting_panel = new System.Windows.Forms.Panel();
             this.clear_one_samplenum_btn = new System.Windows.Forms.Button();
@@ -107,14 +91,18 @@ namespace SerialScreen_ver1
             this.label_adc_threshold = new System.Windows.Forms.Label();
             this.textBox_threshold = new System.Windows.Forms.TextBox();
             this.label8 = new System.Windows.Forms.Label();
+            this.button_autoopen = new System.Windows.Forms.Button();
+            this.button_adcStart = new System.Windows.Forms.Button();
+            this.button_adcStop = new System.Windows.Forms.Button();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.panel3 = new System.Windows.Forms.Panel();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.panel1.SuspendLayout();
-            this.panel2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart_MCA)).BeginInit();
             this.panel_mca_setting.SuspendLayout();
             this.panel_adc_setting.SuspendLayout();
-            this.panel3.SuspendLayout();
             this.mcu_setting_panel.SuspendLayout();
+            this.panel2.SuspendLayout();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -124,78 +112,27 @@ namespace SerialScreen_ver1
             this.serialPort1.ReceivedBytesThreshold = 200;
             this.serialPort1.DataReceived += new System.IO.Ports.SerialDataReceivedEventHandler(this.serialPort1_DataReceived_1);
             // 
-            // button_open
-            // 
-            this.button_open.Location = new System.Drawing.Point(12, 12);
-            this.button_open.Name = "button_open";
-            this.button_open.Size = new System.Drawing.Size(97, 23);
-            this.button_open.TabIndex = 0;
-            this.button_open.Text = "COM_OPEN";
-            this.button_open.UseVisualStyleBackColor = true;
-            this.button_open.Click += new System.EventHandler(this.button_open_Click);
-            // 
-            // comboBox_com
-            // 
-            this.comboBox_com.FormattingEnabled = true;
-            this.comboBox_com.Location = new System.Drawing.Point(115, 15);
-            this.comboBox_com.Name = "comboBox_com";
-            this.comboBox_com.Size = new System.Drawing.Size(121, 20);
-            this.comboBox_com.TabIndex = 1;
-            // 
             // button_close
             // 
-            this.button_close.Location = new System.Drawing.Point(12, 70);
+            this.button_close.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.button_close.Location = new System.Drawing.Point(13, 609);
             this.button_close.Name = "button_close";
-            this.button_close.Size = new System.Drawing.Size(97, 23);
+            this.button_close.Size = new System.Drawing.Size(144, 42);
             this.button_close.TabIndex = 2;
-            this.button_close.Text = "COM_CLOSE";
+            this.button_close.Text = "接続を解除";
             this.button_close.UseVisualStyleBackColor = true;
             this.button_close.Click += new System.EventHandler(this.button_close_Click);
             // 
-            // textBox1
-            // 
-            this.textBox1.Location = new System.Drawing.Point(927, 596);
-            this.textBox1.Multiline = true;
-            this.textBox1.Name = "textBox1";
-            this.textBox1.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox1.Size = new System.Drawing.Size(486, 118);
-            this.textBox1.TabIndex = 3;
-            // 
-            // comboBox_cmd
-            // 
-            this.comboBox_cmd.FormattingEnabled = true;
-            this.comboBox_cmd.Items.AddRange(new object[] {
-            "LED_TOGGLE",
-            "Hello",
-            "ADC_ON",
-            "ADC_OFF",
-            "SINGLE_ADC",
-            "setting"});
-            this.comboBox_cmd.Location = new System.Drawing.Point(115, 44);
-            this.comboBox_cmd.Name = "comboBox_cmd";
-            this.comboBox_cmd.Size = new System.Drawing.Size(121, 20);
-            this.comboBox_cmd.TabIndex = 5;
-            this.comboBox_cmd.Text = "LED_TOGGLE";
-            // 
-            // button_send
-            // 
-            this.button_send.Location = new System.Drawing.Point(12, 41);
-            this.button_send.Name = "button_send";
-            this.button_send.Size = new System.Drawing.Size(97, 23);
-            this.button_send.TabIndex = 6;
-            this.button_send.Text = "SEND";
-            this.button_send.UseVisualStyleBackColor = true;
-            this.button_send.Click += new System.EventHandler(this.button3_Click);
-            // 
             // chart1
             // 
+            this.chart1.BackColor = System.Drawing.Color.LightGray;
             this.chart1.BorderlineColor = System.Drawing.Color.Black;
             this.chart1.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea1.Name = "ChartArea1";
             this.chart1.ChartAreas.Add(chartArea1);
             legend1.Name = "Legend1";
             this.chart1.Legends.Add(legend1);
-            this.chart1.Location = new System.Drawing.Point(437, 17);
+            this.chart1.Location = new System.Drawing.Point(590, 17);
             this.chart1.Name = "chart1";
             series1.ChartArea = "ChartArea1";
             series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Point;
@@ -206,7 +143,7 @@ namespace SerialScreen_ver1
             series1.Points.Add(dataPoint2);
             series1.YValuesPerPoint = 4;
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(976, 527);
+            this.chart1.Size = new System.Drawing.Size(823, 527);
             this.chart1.TabIndex = 7;
             this.chart1.Text = "chart1";
             // 
@@ -215,37 +152,6 @@ namespace SerialScreen_ver1
             this.timer1.Enabled = true;
             this.timer1.Interval = 1000;
             this.timer1.Tick += new System.EventHandler(this.Interval_function);
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label1.Font = new System.Drawing.Font("メイリオ", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label1.Location = new System.Drawing.Point(927, 561);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(180, 32);
-            this.label1.TabIndex = 8;
-            this.label1.Text = "Serial Hex Data";
-            // 
-            // textBox_ascii
-            // 
-            this.textBox_ascii.Location = new System.Drawing.Point(435, 596);
-            this.textBox_ascii.Multiline = true;
-            this.textBox_ascii.Name = "textBox_ascii";
-            this.textBox_ascii.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.textBox_ascii.Size = new System.Drawing.Size(486, 118);
-            this.textBox_ascii.TabIndex = 10;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label3.Font = new System.Drawing.Font("メイリオ", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label3.Location = new System.Drawing.Point(435, 561);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(117, 32);
-            this.label3.TabIndex = 13;
-            this.label3.Text = "ASCII変換";
             // 
             // panel1
             // 
@@ -256,9 +162,9 @@ namespace SerialScreen_ver1
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.comboBox_rxsetting);
             this.panel1.Controls.Add(this.comboBox_baudrate);
-            this.panel1.Location = new System.Drawing.Point(12, 162);
+            this.panel1.Location = new System.Drawing.Point(1256, 233);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(371, 125);
+            this.panel1.Size = new System.Drawing.Size(371, 135);
             this.panel1.TabIndex = 16;
             // 
             // comboBox_BufThresh
@@ -336,70 +242,11 @@ namespace SerialScreen_ver1
             this.label_setting_title.AutoSize = true;
             this.label_setting_title.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label_setting_title.Font = new System.Drawing.Font("MS UI Gothic", 14F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_setting_title.Location = new System.Drawing.Point(14, 138);
+            this.label_setting_title.Location = new System.Drawing.Point(488, 572);
             this.label_setting_title.Name = "label_setting_title";
             this.label_setting_title.Size = new System.Drawing.Size(91, 21);
             this.label_setting_title.TabIndex = 20;
             this.label_setting_title.Text = "詳細設定";
-            // 
-            // comboBox_adcDisplay
-            // 
-            this.comboBox_adcDisplay.FormattingEnabled = true;
-            this.comboBox_adcDisplay.Items.AddRange(new object[] {
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9"});
-            this.comboBox_adcDisplay.Location = new System.Drawing.Point(20, 47);
-            this.comboBox_adcDisplay.Name = "comboBox_adcDisplay";
-            this.comboBox_adcDisplay.Size = new System.Drawing.Size(79, 20);
-            this.comboBox_adcDisplay.TabIndex = 21;
-            this.comboBox_adcDisplay.SelectedIndexChanged += new System.EventHandler(this.comboBox_adcDisplay_SelectedIndexChanged);
-            // 
-            // panel2
-            // 
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.label_adcDisplay);
-            this.panel2.Controls.Add(this.comboBox_adcDisplay);
-            this.panel2.Location = new System.Drawing.Point(1276, 304);
-            this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(121, 82);
-            this.panel2.TabIndex = 22;
-            // 
-            // label_adcDisplay
-            // 
-            this.label_adcDisplay.AutoSize = true;
-            this.label_adcDisplay.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_adcDisplay.Location = new System.Drawing.Point(17, 12);
-            this.label_adcDisplay.Name = "label_adcDisplay";
-            this.label_adcDisplay.Size = new System.Drawing.Size(93, 16);
-            this.label_adcDisplay.TabIndex = 22;
-            this.label_adcDisplay.Text = "ADC表示数";
-            // 
-            // button_ascii_delete
-            // 
-            this.button_ascii_delete.Location = new System.Drawing.Point(558, 561);
-            this.button_ascii_delete.Name = "button_ascii_delete";
-            this.button_ascii_delete.Size = new System.Drawing.Size(72, 32);
-            this.button_ascii_delete.TabIndex = 23;
-            this.button_ascii_delete.Text = "消去";
-            this.button_ascii_delete.UseVisualStyleBackColor = true;
-            this.button_ascii_delete.Click += new System.EventHandler(this.button_ascii_delete_Click);
-            // 
-            // button_hex_delete
-            // 
-            this.button_hex_delete.Location = new System.Drawing.Point(1113, 561);
-            this.button_hex_delete.Name = "button_hex_delete";
-            this.button_hex_delete.Size = new System.Drawing.Size(72, 32);
-            this.button_hex_delete.TabIndex = 24;
-            this.button_hex_delete.Text = "消去";
-            this.button_hex_delete.UseVisualStyleBackColor = true;
-            this.button_hex_delete.Click += new System.EventHandler(this.button_hex_delete_Click);
             // 
             // button_chart_clear
             // 
@@ -409,21 +256,23 @@ namespace SerialScreen_ver1
             this.button_chart_clear.TabIndex = 25;
             this.button_chart_clear.Text = "クリア";
             this.button_chart_clear.UseVisualStyleBackColor = true;
-            this.button_chart_clear.Click += new System.EventHandler(this.button_chart_clear_Click);
             // 
             // chart_MCA
             // 
+            this.chart_MCA.BackColor = System.Drawing.Color.LightGray;
+            this.chart_MCA.BorderlineColor = System.Drawing.Color.Black;
+            this.chart_MCA.BorderlineDashStyle = System.Windows.Forms.DataVisualization.Charting.ChartDashStyle.Solid;
             chartArea2.Name = "ChartArea1";
             this.chart_MCA.ChartAreas.Add(chartArea2);
             legend2.Name = "Legend1";
             this.chart_MCA.Legends.Add(legend2);
-            this.chart_MCA.Location = new System.Drawing.Point(12, 304);
+            this.chart_MCA.Location = new System.Drawing.Point(12, 17);
             this.chart_MCA.Name = "chart_MCA";
             series2.ChartArea = "ChartArea1";
             series2.Legend = "Legend1";
             series2.Name = "Series1";
             this.chart_MCA.Series.Add(series2);
-            this.chart_MCA.Size = new System.Drawing.Size(417, 410);
+            this.chart_MCA.Size = new System.Drawing.Size(572, 527);
             this.chart_MCA.TabIndex = 26;
             this.chart_MCA.Text = "chart2";
             // 
@@ -431,7 +280,7 @@ namespace SerialScreen_ver1
             // 
             this.label_chart_res.AutoSize = true;
             this.label_chart_res.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_chart_res.Location = new System.Drawing.Point(341, 577);
+            this.label_chart_res.Location = new System.Drawing.Point(485, 329);
             this.label_chart_res.Name = "label_chart_res";
             this.label_chart_res.Size = new System.Drawing.Size(42, 16);
             this.label_chart_res.TabIndex = 22;
@@ -444,7 +293,7 @@ namespace SerialScreen_ver1
             "4096(12bit)",
             "1024(10bit)",
             "256(8bit)"});
-            this.comboBox_horizon.Location = new System.Drawing.Point(330, 596);
+            this.comboBox_horizon.Location = new System.Drawing.Point(474, 348);
             this.comboBox_horizon.Name = "comboBox_horizon";
             this.comboBox_horizon.Size = new System.Drawing.Size(79, 20);
             this.comboBox_horizon.TabIndex = 21;
@@ -473,7 +322,7 @@ namespace SerialScreen_ver1
             this.panel_mca_setting.Controls.Add(this.comboBox_adc_res);
             this.panel_mca_setting.Controls.Add(this.label_Pulse_Num);
             this.panel_mca_setting.Controls.Add(this.label_mca_specific);
-            this.panel_mca_setting.Location = new System.Drawing.Point(36, 317);
+            this.panel_mca_setting.Location = new System.Drawing.Point(33, 305);
             this.panel_mca_setting.Name = "panel_mca_setting";
             this.panel_mca_setting.Size = new System.Drawing.Size(200, 227);
             this.panel_mca_setting.TabIndex = 27;
@@ -582,7 +431,7 @@ namespace SerialScreen_ver1
             // 
             // button_mca_setting_display
             // 
-            this.button_mca_setting_display.Location = new System.Drawing.Point(330, 668);
+            this.button_mca_setting_display.Location = new System.Drawing.Point(474, 420);
             this.button_mca_setting_display.Name = "button_mca_setting_display";
             this.button_mca_setting_display.Size = new System.Drawing.Size(75, 23);
             this.button_mca_setting_display.TabIndex = 28;
@@ -592,10 +441,11 @@ namespace SerialScreen_ver1
             // 
             // button_MCA_ON
             // 
+            this.button_MCA_ON.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.button_MCA_ON.ForeColor = System.Drawing.Color.Red;
-            this.button_MCA_ON.Location = new System.Drawing.Point(318, 350);
+            this.button_MCA_ON.Location = new System.Drawing.Point(313, 562);
             this.button_MCA_ON.Name = "button_MCA_ON";
-            this.button_MCA_ON.Size = new System.Drawing.Size(95, 24);
+            this.button_MCA_ON.Size = new System.Drawing.Size(111, 41);
             this.button_MCA_ON.TabIndex = 29;
             this.button_MCA_ON.Text = "MCA ON";
             this.button_MCA_ON.UseVisualStyleBackColor = true;
@@ -603,10 +453,11 @@ namespace SerialScreen_ver1
             // 
             // button_MCA_OFF
             // 
+            this.button_MCA_OFF.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.button_MCA_OFF.ForeColor = System.Drawing.Color.Blue;
-            this.button_MCA_OFF.Location = new System.Drawing.Point(318, 380);
+            this.button_MCA_OFF.Location = new System.Drawing.Point(313, 609);
             this.button_MCA_OFF.Name = "button_MCA_OFF";
-            this.button_MCA_OFF.Size = new System.Drawing.Size(95, 24);
+            this.button_MCA_OFF.Size = new System.Drawing.Size(111, 42);
             this.button_MCA_OFF.TabIndex = 30;
             this.button_MCA_OFF.Text = "MCA OFF";
             this.button_MCA_OFF.UseVisualStyleBackColor = true;
@@ -614,7 +465,7 @@ namespace SerialScreen_ver1
             // 
             // button_mca_clear
             // 
-            this.button_mca_clear.Location = new System.Drawing.Point(330, 639);
+            this.button_mca_clear.Location = new System.Drawing.Point(487, 469);
             this.button_mca_clear.Name = "button_mca_clear";
             this.button_mca_clear.Size = new System.Drawing.Size(75, 23);
             this.button_mca_clear.TabIndex = 31;
@@ -625,7 +476,7 @@ namespace SerialScreen_ver1
             // btn_rx_buf_clear
             // 
             this.btn_rx_buf_clear.ForeColor = System.Drawing.Color.Fuchsia;
-            this.btn_rx_buf_clear.Location = new System.Drawing.Point(148, 103);
+            this.btn_rx_buf_clear.Location = new System.Drawing.Point(53, 657);
             this.btn_rx_buf_clear.Name = "btn_rx_buf_clear";
             this.btn_rx_buf_clear.Size = new System.Drawing.Size(104, 34);
             this.btn_rx_buf_clear.TabIndex = 32;
@@ -686,63 +537,19 @@ namespace SerialScreen_ver1
             // 
             // button_csv_out
             // 
+            this.button_csv_out.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
             this.button_csv_out.ForeColor = System.Drawing.Color.Purple;
-            this.button_csv_out.Location = new System.Drawing.Point(318, 414);
+            this.button_csv_out.Location = new System.Drawing.Point(313, 657);
             this.button_csv_out.Name = "button_csv_out";
-            this.button_csv_out.Size = new System.Drawing.Size(95, 34);
+            this.button_csv_out.Size = new System.Drawing.Size(111, 34);
             this.button_csv_out.TabIndex = 35;
             this.button_csv_out.Text = "MCAをcsv出力";
             this.button_csv_out.UseVisualStyleBackColor = true;
             this.button_csv_out.Click += new System.EventHandler(this.button_csv_out_Click);
             // 
-            // checkBox_chart
-            // 
-            this.checkBox_chart.AutoSize = true;
-            this.checkBox_chart.Location = new System.Drawing.Point(19, 5);
-            this.checkBox_chart.Name = "checkBox_chart";
-            this.checkBox_chart.Size = new System.Drawing.Size(52, 16);
-            this.checkBox_chart.TabIndex = 36;
-            this.checkBox_chart.Text = "Chart";
-            this.checkBox_chart.UseVisualStyleBackColor = true;
-            this.checkBox_chart.CheckedChanged += new System.EventHandler(this.checkBox_chart_CheckedChanged);
-            // 
-            // panel3
-            // 
-            this.panel3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(224)))), ((int)(((byte)(192)))));
-            this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel3.Controls.Add(this.checkBox_hex);
-            this.panel3.Controls.Add(this.checkBox_ascii);
-            this.panel3.Controls.Add(this.checkBox_chart);
-            this.panel3.Location = new System.Drawing.Point(261, 18);
-            this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(168, 75);
-            this.panel3.TabIndex = 37;
-            // 
-            // checkBox_hex
-            // 
-            this.checkBox_hex.AutoSize = true;
-            this.checkBox_hex.Location = new System.Drawing.Point(19, 49);
-            this.checkBox_hex.Name = "checkBox_hex";
-            this.checkBox_hex.Size = new System.Drawing.Size(105, 16);
-            this.checkBox_hex.TabIndex = 38;
-            this.checkBox_hex.Text = "Serial Hex Data";
-            this.checkBox_hex.UseVisualStyleBackColor = true;
-            this.checkBox_hex.CheckedChanged += new System.EventHandler(this.checkBox_hex_CheckedChanged);
-            // 
-            // checkBox_ascii
-            // 
-            this.checkBox_ascii.AutoSize = true;
-            this.checkBox_ascii.Location = new System.Drawing.Point(19, 27);
-            this.checkBox_ascii.Name = "checkBox_ascii";
-            this.checkBox_ascii.Size = new System.Drawing.Size(77, 16);
-            this.checkBox_ascii.TabIndex = 37;
-            this.checkBox_ascii.Text = "ASCII変換";
-            this.checkBox_ascii.UseVisualStyleBackColor = true;
-            this.checkBox_ascii.CheckedChanged += new System.EventHandler(this.checkBox_ascii_CheckedChanged);
-            // 
             // mcu_setting_btn
             // 
-            this.mcu_setting_btn.Location = new System.Drawing.Point(259, 103);
+            this.mcu_setting_btn.Location = new System.Drawing.Point(559, 15);
             this.mcu_setting_btn.Name = "mcu_setting_btn";
             this.mcu_setting_btn.Size = new System.Drawing.Size(124, 34);
             this.mcu_setting_btn.TabIndex = 38;
@@ -752,6 +559,8 @@ namespace SerialScreen_ver1
             // 
             // mcu_setting_panel
             // 
+            this.mcu_setting_panel.BackColor = System.Drawing.SystemColors.ButtonFace;
+            this.mcu_setting_panel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this.mcu_setting_panel.Controls.Add(this.clear_one_samplenum_btn);
             this.mcu_setting_panel.Controls.Add(this.clear_thresh_btn);
             this.mcu_setting_panel.Controls.Add(this.label_adc_threshold_dis);
@@ -761,15 +570,14 @@ namespace SerialScreen_ver1
             this.mcu_setting_panel.Controls.Add(this.label_adc_sample_num);
             this.mcu_setting_panel.Controls.Add(this.label_adc_threshold);
             this.mcu_setting_panel.Controls.Add(this.textBox_threshold);
-            this.mcu_setting_panel.Controls.Add(this.label8);
-            this.mcu_setting_panel.Location = new System.Drawing.Point(449, 150);
+            this.mcu_setting_panel.Location = new System.Drawing.Point(3, 3);
             this.mcu_setting_panel.Name = "mcu_setting_panel";
-            this.mcu_setting_panel.Size = new System.Drawing.Size(314, 208);
+            this.mcu_setting_panel.Size = new System.Drawing.Size(320, 142);
             this.mcu_setting_panel.TabIndex = 40;
             // 
             // clear_one_samplenum_btn
             // 
-            this.clear_one_samplenum_btn.Location = new System.Drawing.Point(255, 93);
+            this.clear_one_samplenum_btn.Location = new System.Drawing.Point(233, 66);
             this.clear_one_samplenum_btn.Name = "clear_one_samplenum_btn";
             this.clear_one_samplenum_btn.Size = new System.Drawing.Size(56, 23);
             this.clear_one_samplenum_btn.TabIndex = 42;
@@ -779,7 +587,8 @@ namespace SerialScreen_ver1
             // 
             // clear_thresh_btn
             // 
-            this.clear_thresh_btn.Location = new System.Drawing.Point(255, 40);
+            this.clear_thresh_btn.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.clear_thresh_btn.Location = new System.Drawing.Point(181, 4);
             this.clear_thresh_btn.Name = "clear_thresh_btn";
             this.clear_thresh_btn.Size = new System.Drawing.Size(56, 23);
             this.clear_thresh_btn.TabIndex = 41;
@@ -792,7 +601,7 @@ namespace SerialScreen_ver1
             this.label_adc_threshold_dis.AutoSize = true;
             this.label_adc_threshold_dis.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
             this.label_adc_threshold_dis.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_adc_threshold_dis.Location = new System.Drawing.Point(72, 64);
+            this.label_adc_threshold_dis.Location = new System.Drawing.Point(180, 39);
             this.label_adc_threshold_dis.Name = "label_adc_threshold_dis";
             this.label_adc_threshold_dis.Size = new System.Drawing.Size(109, 16);
             this.label_adc_threshold_dis.TabIndex = 40;
@@ -800,7 +609,7 @@ namespace SerialScreen_ver1
             // 
             // button_mcu_setting_panel_off
             // 
-            this.button_mcu_setting_panel_off.Location = new System.Drawing.Point(73, 176);
+            this.button_mcu_setting_panel_off.Location = new System.Drawing.Point(84, 99);
             this.button_mcu_setting_panel_off.Name = "button_mcu_setting_panel_off";
             this.button_mcu_setting_panel_off.Size = new System.Drawing.Size(75, 23);
             this.button_mcu_setting_panel_off.TabIndex = 34;
@@ -810,7 +619,7 @@ namespace SerialScreen_ver1
             // 
             // button_mcu_setting_on
             // 
-            this.button_mcu_setting_on.Location = new System.Drawing.Point(178, 176);
+            this.button_mcu_setting_on.Location = new System.Drawing.Point(174, 99);
             this.button_mcu_setting_on.Name = "button_mcu_setting_on";
             this.button_mcu_setting_on.Size = new System.Drawing.Size(115, 23);
             this.button_mcu_setting_on.TabIndex = 33;
@@ -820,7 +629,7 @@ namespace SerialScreen_ver1
             // 
             // textBox_pulse_num
             // 
-            this.textBox_pulse_num.Location = new System.Drawing.Point(178, 95);
+            this.textBox_pulse_num.Location = new System.Drawing.Point(154, 66);
             this.textBox_pulse_num.Name = "textBox_pulse_num";
             this.textBox_pulse_num.Size = new System.Drawing.Size(73, 19);
             this.textBox_pulse_num.TabIndex = 32;
@@ -830,7 +639,7 @@ namespace SerialScreen_ver1
             // 
             this.label_adc_sample_num.AutoSize = true;
             this.label_adc_sample_num.Font = new System.Drawing.Font("MS UI Gothic", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_adc_sample_num.Location = new System.Drawing.Point(25, 97);
+            this.label_adc_sample_num.Location = new System.Drawing.Point(25, 66);
             this.label_adc_sample_num.Name = "label_adc_sample_num";
             this.label_adc_sample_num.Size = new System.Drawing.Size(123, 15);
             this.label_adc_sample_num.TabIndex = 31;
@@ -839,20 +648,21 @@ namespace SerialScreen_ver1
             // label_adc_threshold
             // 
             this.label_adc_threshold.AutoSize = true;
-            this.label_adc_threshold.Font = new System.Drawing.Font("MS UI Gothic", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_adc_threshold.Location = new System.Drawing.Point(25, 46);
+            this.label_adc_threshold.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label_adc_threshold.Location = new System.Drawing.Point(15, 10);
             this.label_adc_threshold.Name = "label_adc_threshold";
-            this.label_adc_threshold.Size = new System.Drawing.Size(66, 15);
+            this.label_adc_threshold.Size = new System.Drawing.Size(81, 14);
             this.label_adc_threshold.TabIndex = 29;
-            this.label_adc_threshold.Text = "ADC閾値";
+            this.label_adc_threshold.Text = "ADCトリガー";
             this.label_adc_threshold.MouseLeave += new System.EventHandler(this.label_adc_threshold_MouseLeave);
             this.label_adc_threshold.MouseHover += new System.EventHandler(this.label_adc_threshold_MouseHover);
             // 
             // textBox_threshold
             // 
-            this.textBox_threshold.Location = new System.Drawing.Point(178, 42);
+            this.textBox_threshold.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.textBox_threshold.Location = new System.Drawing.Point(102, 5);
             this.textBox_threshold.Name = "textBox_threshold";
-            this.textBox_threshold.Size = new System.Drawing.Size(73, 19);
+            this.textBox_threshold.Size = new System.Drawing.Size(73, 21);
             this.textBox_threshold.TabIndex = 30;
             this.textBox_threshold.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox_threshold_KeyPress);
             // 
@@ -861,66 +671,112 @@ namespace SerialScreen_ver1
             this.label8.AutoSize = true;
             this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.label8.Font = new System.Drawing.Font("MS UI Gothic", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label8.Location = new System.Drawing.Point(12, 12);
+            this.label8.Location = new System.Drawing.Point(418, 32);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(88, 17);
             this.label8.TabIndex = 29;
             this.label8.Text = "マイコン設定";
             // 
+            // button_autoopen
+            // 
+            this.button_autoopen.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.button_autoopen.Location = new System.Drawing.Point(13, 559);
+            this.button_autoopen.Name = "button_autoopen";
+            this.button_autoopen.Size = new System.Drawing.Size(144, 43);
+            this.button_autoopen.TabIndex = 41;
+            this.button_autoopen.Text = "STM32と接続";
+            this.button_autoopen.UseVisualStyleBackColor = true;
+            this.button_autoopen.Click += new System.EventHandler(this.button_autoopen_Click);
+            // 
+            // button_adcStart
+            // 
+            this.button_adcStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
+            this.button_adcStart.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.button_adcStart.Location = new System.Drawing.Point(163, 560);
+            this.button_adcStart.Name = "button_adcStart";
+            this.button_adcStart.Size = new System.Drawing.Size(144, 42);
+            this.button_adcStart.TabIndex = 42;
+            this.button_adcStart.Text = "ADCスタート";
+            this.button_adcStart.UseVisualStyleBackColor = false;
+            this.button_adcStart.Click += new System.EventHandler(this.button_adcStart_Click);
+            // 
+            // button_adcStop
+            // 
+            this.button_adcStop.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.button_adcStop.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.button_adcStop.Location = new System.Drawing.Point(163, 608);
+            this.button_adcStop.Name = "button_adcStop";
+            this.button_adcStop.Size = new System.Drawing.Size(144, 42);
+            this.button_adcStop.TabIndex = 43;
+            this.button_adcStop.Text = "ADCストップ";
+            this.button_adcStop.UseVisualStyleBackColor = false;
+            this.button_adcStop.Click += new System.EventHandler(this.button_adcStop_Click);
+            // 
+            // panel2
+            // 
+            this.panel2.BackColor = System.Drawing.SystemColors.ButtonShadow;
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.panel2.Controls.Add(this.mcu_setting_panel);
+            this.panel2.Controls.Add(this.label8);
+            this.panel2.Controls.Add(this.mcu_setting_btn);
+            this.panel2.Location = new System.Drawing.Point(590, 562);
+            this.panel2.Name = "panel2";
+            this.panel2.Size = new System.Drawing.Size(823, 152);
+            this.panel2.TabIndex = 44;
+            // 
+            // panel3
+            // 
+            this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel3.Location = new System.Drawing.Point(1253, 82);
+            this.panel3.Name = "panel3";
+            this.panel3.Size = new System.Drawing.Size(144, 90);
+            this.panel3.TabIndex = 45;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1425, 726);
-            this.Controls.Add(this.mcu_setting_panel);
-            this.Controls.Add(this.mcu_setting_btn);
+            this.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.ClientSize = new System.Drawing.Size(1425, 721);
             this.Controls.Add(this.panel3);
+            this.Controls.Add(this.panel1);
+            this.Controls.Add(this.panel2);
+            this.Controls.Add(this.button_adcStop);
+            this.Controls.Add(this.button_adcStart);
+            this.Controls.Add(this.button_autoopen);
             this.Controls.Add(this.button_csv_out);
+            this.Controls.Add(this.button_mca_clear);
             this.Controls.Add(this.panel_adc_setting);
             this.Controls.Add(this.button_adc_setting);
             this.Controls.Add(this.btn_rx_buf_clear);
             this.Controls.Add(this.comboBox_horizon);
             this.Controls.Add(this.label_chart_res);
-            this.Controls.Add(this.button_mca_clear);
             this.Controls.Add(this.button_MCA_OFF);
             this.Controls.Add(this.button_MCA_ON);
             this.Controls.Add(this.button_mca_setting_display);
             this.Controls.Add(this.panel_mca_setting);
-            this.Controls.Add(this.chart_MCA);
             this.Controls.Add(this.button_chart_clear);
-            this.Controls.Add(this.button_hex_delete);
-            this.Controls.Add(this.button_ascii_delete);
-            this.Controls.Add(this.panel2);
             this.Controls.Add(this.label_setting_title);
-            this.Controls.Add(this.panel1);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.textBox_ascii);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.chart1);
-            this.Controls.Add(this.button_send);
-            this.Controls.Add(this.comboBox_cmd);
-            this.Controls.Add(this.textBox1);
             this.Controls.Add(this.button_close);
-            this.Controls.Add(this.comboBox_com);
-            this.Controls.Add(this.button_open);
+            this.Controls.Add(this.chart_MCA);
+            this.Controls.Add(this.chart1);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "Form1";
             this.ShowInTaskbar = false;
-            this.Text = "Form1";
+            this.Text = "STM32F4series MCAアプリケーション";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             this.panel1.ResumeLayout(false);
             this.panel1.PerformLayout();
-            this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart_MCA)).EndInit();
             this.panel_mca_setting.ResumeLayout(false);
             this.panel_mca_setting.PerformLayout();
             this.panel_adc_setting.ResumeLayout(false);
             this.panel_adc_setting.PerformLayout();
-            this.panel3.ResumeLayout(false);
-            this.panel3.PerformLayout();
             this.mcu_setting_panel.ResumeLayout(false);
             this.mcu_setting_panel.PerformLayout();
+            this.panel2.ResumeLayout(false);
+            this.panel2.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -942,17 +798,9 @@ namespace SerialScreen_ver1
         #endregion
         private System.IO.Ports.SerialPort serialPort1;
         private SerialDataReceivedEventHandler serialPort1_DataReceived;
-        private System.Windows.Forms.Button button_open;
-        private System.Windows.Forms.ComboBox comboBox_com;
         private System.Windows.Forms.Button button_close;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.ComboBox comboBox_cmd;
-        private System.Windows.Forms.Button button_send;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
         private System.Windows.Forms.Timer timer1;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox_ascii;
-        private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label2;
@@ -961,11 +809,6 @@ namespace SerialScreen_ver1
         private System.Windows.Forms.Label label_setting_title;
         private System.Windows.Forms.ComboBox comboBox_BufThresh;
         private System.Windows.Forms.Label label_BufTh;
-        private System.Windows.Forms.ComboBox comboBox_adcDisplay;
-        private System.Windows.Forms.Panel panel2;
-        private System.Windows.Forms.Label label_adcDisplay;
-        private System.Windows.Forms.Button button_ascii_delete;
-        private System.Windows.Forms.Button button_hex_delete;
         private System.Windows.Forms.Button button_chart_clear;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart_MCA;
         private System.Windows.Forms.Label label_chart_res;
@@ -991,10 +834,6 @@ namespace SerialScreen_ver1
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button button_close_mca;
         private System.Windows.Forms.Button button_close_adc;
-        private System.Windows.Forms.CheckBox checkBox_chart;
-        private System.Windows.Forms.Panel panel3;
-        private System.Windows.Forms.CheckBox checkBox_hex;
-        private System.Windows.Forms.CheckBox checkBox_ascii;
         private System.Windows.Forms.Button mcu_setting_btn;
         private System.Windows.Forms.Panel mcu_setting_panel;
         private System.Windows.Forms.Label label8;
@@ -1007,6 +846,11 @@ namespace SerialScreen_ver1
         private System.Windows.Forms.Label label_adc_threshold_dis;
         private System.Windows.Forms.Button clear_one_samplenum_btn;
         private System.Windows.Forms.Button clear_thresh_btn;
+        private System.Windows.Forms.Button button_autoopen;
+        private System.Windows.Forms.Button button_adcStart;
+        private System.Windows.Forms.Button button_adcStop;
+        private System.Windows.Forms.Panel panel2;
+        private System.Windows.Forms.Panel panel3;
     }
 }
 

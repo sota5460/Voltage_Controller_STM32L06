@@ -14,25 +14,12 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.IO;
-using System.Text;
+
 
 
 namespace SerialScreen_ver1
 {
     
-    public struct Mode
-    {
-        public int chart;
-        public int ascii;
-        public int hex;
-
-        public Mode(int chart, int ascii, int hex)
-        {
-            this.chart = chart;
-            this.ascii = ascii;
-            this.hex = hex;
-        }
-    }
 
 
     public partial class Form1 : Form
@@ -47,10 +34,8 @@ namespace SerialScreen_ver1
         public byte[] receive_buf; // = new byte[data_num];
         public short[] short_buf; // = new short[data_num / 2];
 
-
-
-        Mode mode = new Mode() { chart = 0, ascii = 0, hex = 0 };
-
+        public string adc_start_code = "C"; //マイコン側で設定しているコード hexで0x43
+        public string adc_stop_code = "D"; //マイコン側で設定しているコード hexで0x44
 
         //
         // ADC Charts variables
@@ -60,14 +45,14 @@ namespace SerialScreen_ver1
         public int adc_diplay_num = 1;
 
         public Series adc1 = new Series();
-        public Series adc2 = new Series();
-        public Series adc3 = new Series();
-        public Series adc4 = new Series();
-        public Series adc5 = new Series();
-        public Series adc6 = new Series();
-        public Series adc7 = new Series();
-        public Series adc8 = new Series();
-        public Series adc9 = new Series();
+        //public Series adc2 = new Series();
+        //public Series adc3 = new Series();
+        //public Series adc4 = new Series();
+        //public Series adc5 = new Series();
+        //public Series adc6 = new Series();
+        //public Series adc7 = new Series();
+        //public Series adc8 = new Series();
+        //public Series adc9 = new Series();
 
         public void buf_etc_setting(int buf_size)
         {
@@ -198,6 +183,7 @@ namespace SerialScreen_ver1
 
             chart_init();
             chart_MCA_init();
+
             
         }
 
@@ -207,7 +193,7 @@ namespace SerialScreen_ver1
             comboBox_BufThresh.SelectedIndex = 1;
             comboBox_baudrate.SelectedIndex = 0;
             comboBox_rxsetting.SelectedIndex = 0;
-            comboBox_adcDisplay.SelectedIndex = 0;
+            
             comboBox_horizon.SelectedIndex = 0;
             comboBox_adc_res.SelectedIndex = 0;
             comboBox_pulse_num.SelectedIndex = 10;
@@ -285,8 +271,6 @@ namespace SerialScreen_ver1
             serialPort1.ReceivedBytesThreshold = buf_thresh_setting;
             serialPort1.Open();
 
-            //setting for adc_chart just in case
-            adc_diplay_num = comboBox_adcDisplay.SelectedIndex + 1;
 
             //receive_buffer reset
             serialPort1.DiscardInBuffer();
@@ -307,72 +291,34 @@ namespace SerialScreen_ver1
             comboBox_BufThresh.Enabled = false;
             comboBox_rxsetting.Enabled = false;
             comboBox_cmd.Enabled = true;
-            comboBox_adcDisplay.Enabled = false;
 
 
         }
 
         private void button_close_Click(object sender, EventArgs e)
         {
+            serialPort1.Write(adc_stop_code);
+
+            serialPort1.DiscardInBuffer();
+
             serialPort1.Close();
 
-            button_open.Enabled = true;
-            comboBox_com.Enabled = true;
-            button_close.Enabled = false;
-            button_send.Enabled = false;
-            btn_rx_buf_clear.Enabled = false;
-            btn_rx_buf_clear.Visible = false;
+            //button_open.Enabled = true;
+            //comboBox_com.Enabled = true;
+            //button_close.Enabled = false;
+            //button_send.Enabled = false;
+            //btn_rx_buf_clear.Enabled = false;
+            //btn_rx_buf_clear.Visible = false;
 
-            mcu_setting_btn.Enabled = false;
-            mcu_setting_btn.Visible = false;
+            //mcu_setting_btn.Enabled = false;
+            //mcu_setting_btn.Visible = false;
 
-            comboBox_baudrate.Enabled = true;
-            comboBox_BufThresh.Enabled = true;
-            comboBox_rxsetting.Enabled = true;
-            comboBox_adcDisplay.Enabled = true;
+            //comboBox_baudrate.Enabled = true;
+            //comboBox_BufThresh.Enabled = true;
+            //comboBox_rxsetting.Enabled = true;
         }
 
 
-        private void Response_text(string text)
-        {
-            if (textBox1.InvokeRequired)
-            {
-                SetTextCallback d = new SetTextCallback(Response_text);
-                Invoke(d, new object[] { text });
-            }
-            else
-            {
-                textBox_ascii.AppendText(text + "\n");
-            }
-        }
-
-
-
-
-        private void Response(byte[] txt)
-        {
-            if (textBox1.InvokeRequired)
-            {
-                SetByteCallback d = new SetByteCallback(Response);
-                BeginInvoke(d, txt);      // <--ここを変える
-            }
-            else
-            {
-                textBox1.AppendText(BitConverter.ToString(txt) + "\n");
-            }
-        }
-
-        private void ASCII_Response(string text)
-        {
-            if (textBox_ascii.InvokeRequired)
-            {
-                SetASCIICallback d = new SetASCIICallback(ASCII_Response);
-                BeginInvoke(d, new object[] { text });
-            }else
-            {
-                textBox_ascii.AppendText(text);
-            }
-        }
 
         private void Chart_Response(int adc_cnt)
         {
@@ -382,18 +328,15 @@ namespace SerialScreen_ver1
                 BeginInvoke(d, adc_cnt);
             }else
             {
-                switch (adc_cnt)
-                {
-                    case (1): multi_chart_update(adc1, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    case (2): multi_chart_update(adc2, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    case (3): multi_chart_update(adc3, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    case (4): multi_chart_update(adc4, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    case (5): multi_chart_update(adc5, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    case (6): multi_chart_update(adc6, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    case (7): multi_chart_update(adc7, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    case (8): multi_chart_update(adc8, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    case (9): multi_chart_update(adc9, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                }
+                     multi_chart_update(adc1, short_to_int(short_buf, data_num / 2), data_num / 2); 
+                    //case (2): multi_chart_update(adc2, short_to_int(short_buf, data_num / 2), data_num / 2); break;
+                    //case (3): multi_chart_update(adc3, short_to_int(short_buf, data_num / 2), data_num / 2); break;
+                    //case (4): multi_chart_update(adc4, short_to_int(short_buf, data_num / 2), data_num / 2); break;
+                    //case (5): multi_chart_update(adc5, short_to_int(short_buf, data_num / 2), data_num / 2); break;
+                    //case (6): multi_chart_update(adc6, short_to_int(short_buf, data_num / 2), data_num / 2); break;
+                    //case (7): multi_chart_update(adc7, short_to_int(short_buf, data_num / 2), data_num / 2); break;
+                    //case (8): multi_chart_update(adc8, short_to_int(short_buf, data_num / 2), data_num / 2); break;
+                    //case (9): multi_chart_update(adc9, short_to_int(short_buf, data_num / 2), data_num / 2); break;
 
 
             }
@@ -408,21 +351,25 @@ namespace SerialScreen_ver1
             int read_bytes = serialPort1.BytesToRead;
             Console.Write("read bytes is {0} \n", read_bytes);
 
-            if (read_bytes == data_num && rx_setting == 0)
+            if (read_bytes > data_num)
             {
-                
-                serialPort1.Read(receive_buf, 0, data_num);
-                
-                
-                Console.WriteLine(BitConverter.ToString(receive_buf));
 
-                if (buf_thresh_setting < 3) {
-                    goto JUMP_LABEL;
-                  };
+                serialPort1.Read(receive_buf, 0, data_num);
+
+                //デリミタ設定して、デリミタまで読むを繰り返すパターン　⇒　デリミタをマイコン側でデータ末尾に付加する必要がある＋adcデータが意図せずデリミタと同じになる可能性。
+                //serialPort1.NewLine = "\n";
+                //string rx_buf = serialPort1.ReadLine();
+
+                //receive_buf = System.Text.Encoding.ASCII.GetBytes(rx_buf);
+
+
+                //if (buf_thresh_setting < 3) {
+                //    goto JUMP_LABEL;
+                //  };
 
                 // convert BYTE data to SHORT data
                 byte[] temp_byte = new byte[2];
-         
+
 
                 for (int i = 0; i < data_num / 2; i++)
                 {
@@ -437,38 +384,27 @@ namespace SerialScreen_ver1
 
 
                 // to display converted short on console 
-                for (int m = 0; m < data_num / 2; m++)
-                {
-                    Console.WriteLine(short_buf[m]);
-                }
+                //for (int m = 0; m < data_num / 2; m++)
+                //{
+                //    Console.WriteLine(short_buf[m]);
+                //}
 
-                JUMP_LABEL:
+                //JUMP_LABEL:
 
-                if(mode.chart == 1)
-                {
-                    Chart_Response(adc_cnt);
-                    //Task.Run(() => Chart_Response(adc_cnt));
 
-                    adc_cnt++;
-                    if (adc_cnt == adc_diplay_num+1)
-                    {
-                        adc_cnt = 1;
-                    };
+                Chart_Response(adc_cnt);
+                //Task.Run(() => Chart_Response(adc_cnt));
 
-                }
+                //adc_cnt++;
+                //if (adc_cnt == adc_diplay_num+1)
+                //{
+                //    adc_cnt = 1;
+                //};
 
-                if(mode.hex == 1)
-                {
-                    Response(receive_buf);
-                }
 
-                if(mode.ascii == 1)
-                {
-                    string text = Encoding.ASCII.GetString(receive_buf);
-                    ASCII_Response(text);
-                }
 
-                if(mca_flag == 1 )
+
+                if (mca_flag == 1)
                 {
                     switch (shadow_cnt)
                     {
@@ -484,31 +420,16 @@ namespace SerialScreen_ver1
                             make_shadow(mca_shortbuf_shadow2, short_buf);
                             Task.Run(() => mca_thread_function(2));
                             break;
-
                     }
 
                     shadow_cnt++;
-                    if(shadow_cnt == 3) { shadow_cnt = 0; }
-                    
+                    if (shadow_cnt == 3) { shadow_cnt = 0; }
+
                 }
 
                 serialPort1.DiscardInBuffer();
-
             }
 
-            if(rx_setting == 1)
-            {
-                string read_line = serialPort1.ReadLine();
-                textBox_ascii.Text = read_line;
-
-                Response_text(read_line);
-            }
-
-            if(rx_setting == 2)
-            {
-                string read_all = serialPort1.ReadExisting();
-                Response_text(read_all);
-            }
         }
 
 
@@ -533,24 +454,24 @@ namespace SerialScreen_ver1
             // series -> each graph 
             // 1. make new series 2.add property 3. add series to chart  
             adc1.ChartType = SeriesChartType.Line;
-            adc2.ChartType = SeriesChartType.Line;
-            adc3.ChartType = SeriesChartType.Line;
-            adc4.ChartType = SeriesChartType.Line;
-            adc5.ChartType = SeriesChartType.Line;
-            adc6.ChartType = SeriesChartType.Line;
-            adc7.ChartType = SeriesChartType.Line;
-            adc8.ChartType = SeriesChartType.Line;
-            adc9.ChartType = SeriesChartType.Line;
+            //adc2.ChartType = SeriesChartType.Line;
+            //adc3.ChartType = SeriesChartType.Line;
+            //adc4.ChartType = SeriesChartType.Line;
+            //adc5.ChartType = SeriesChartType.Line;
+            //adc6.ChartType = SeriesChartType.Line;
+            //adc7.ChartType = SeriesChartType.Line;
+            //adc8.ChartType = SeriesChartType.Line;
+            //adc9.ChartType = SeriesChartType.Line;
 
             adc1.Color = Color.FromArgb(211,96,21) ;
-            adc2.Color = Color.FromArgb(196,182,69);
-            adc3.Color = Color.FromArgb(78,115,166);
-            adc4.Color = Color.FromArgb(123, 78, 166);
-            adc5.Color = Color.FromArgb(166, 78, 78);
-            adc6.Color = Color.FromArgb(166, 160, 78);
-            adc7.Color = Color.FromArgb(90, 155, 78);
-            adc8.Color = Color.FromArgb(24, 27, 24);
-            adc9.Color = Color.FromArgb(61, 32, 26);
+            //adc2.Color = Color.FromArgb(196,182,69);
+            //adc3.Color = Color.FromArgb(78,115,166);
+            //adc4.Color = Color.FromArgb(123, 78, 166);
+            //adc5.Color = Color.FromArgb(166, 78, 78);
+            //adc6.Color = Color.FromArgb(166, 160, 78);
+            //adc7.Color = Color.FromArgb(90, 155, 78);
+            //adc8.Color = Color.FromArgb(24, 27, 24);
+            //adc9.Color = Color.FromArgb(61, 32, 26);
 
             for (int i = 0; i < data_num/2; i++)
             {
@@ -560,18 +481,18 @@ namespace SerialScreen_ver1
             chart1.Series.Add(adc1);
         }
 
-        public void chart_points_clear_all()
-        {
-            adc1.Points.Clear();
-            adc2.Points.Clear();
-            adc3.Points.Clear();
-            adc4.Points.Clear();
-            adc5.Points.Clear();
-            adc6.Points.Clear();
-            adc7.Points.Clear();
-            adc8.Points.Clear();
-            adc9.Points.Clear();
-        }
+        //public void chart_points_clear_all()
+        //{
+        //    adc1.Points.Clear();
+        //    //adc2.Points.Clear();
+        //    //adc3.Points.Clear();
+        //    //adc4.Points.Clear();
+        //    //adc5.Points.Clear();
+        //    //adc6.Points.Clear();
+        //    //adc7.Points.Clear();
+        //    //adc8.Points.Clear();
+        //    //adc9.Points.Clear();
+        //}
 
         public void chart_just_update(Series adc)
         {
@@ -819,68 +740,6 @@ namespace SerialScreen_ver1
 
 
 
-        public void mode_update()
-        {
-            //mode.chart = 0;
-            //mode.ascii = 0;
-            //mode.hex = 0;
-
-            //foreach (string item in checkedListBox_mode.CheckedItems)
-            //{
-            //    switch (item)
-            //    {
-            //        case ("Chart"): 
-            //            mode.chart = 1;
-            //            button_MCA_ON.Enabled = true;
-            //            break;
-            //        case ("ASCII変換"):
-            //            mode.ascii = 1;
-            //            break;
-            //        case ("Serial Hex Data"):
-            //            mode.hex = 1; 
-            //            break;
-            //    }
-            //}
-
-            if (checkBox_chart.Checked)
-            {
-                mode.chart = 1;
-            }
-            else
-            {
-                mode.chart = 0;
-            }
-
-            if (checkBox_ascii.Checked)
-            {
-                mode.ascii = 1;
-            }
-            else
-            {
-                mode.ascii = 0;
-            }
-
-            if (checkBox_hex.Checked)
-            {
-                mode.hex = 1;
-            }
-            else
-            {
-                mode.hex = 0;
-            }
-
-            if(mode.chart == 1)
-            {
-                button_MCA_ON.Enabled = true;
-            }
-            else
-            {
-                button_MCA_ON.Enabled = false;
-            }
-
-        }
-
-
         /// <summary>
         /// MCU_Setting_Methods
         /// you can set the mcu parameter by sending codes.
@@ -965,49 +824,7 @@ namespace SerialScreen_ver1
         }
 
 
-        private void comboBox_adcDisplay_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            adc_diplay_num = comboBox_adcDisplay.SelectedIndex + 1;
-            adc_cnt = 1;
-            chart1.Series.Clear();
 
-            chart_init();
-        }
-
-
-        private void button_ascii_delete_Click(object sender, EventArgs e)
-        {
-            textBox_ascii.Clear();
-        }
-
-        private void button_hex_delete_Click(object sender, EventArgs e)
-        {
-            textBox1.Clear();
-        }
-
-        private void button_chart_clear_Click(object sender, EventArgs e)
-        {
-            chart_points_clear_all();
-
-            for(int i = 1; i < adc_diplay_num + 1; i ++)
-            {
-                switch (i)
-                {
-                    case (1): chart_just_update(adc1); break;
-                    case (2): chart_just_update(adc2); break;
-                    case (3): chart_just_update(adc3); break;
-                    case (4): chart_just_update(adc4); break;
-                    case (5): chart_just_update(adc5); break;
-                    case (6): chart_just_update(adc6); break;
-                    case (7): chart_just_update(adc7); break;
-                    case (8): chart_just_update(adc8); break;
-                    case (9): chart_just_update(adc9); break;
-                }
-            }
-
-            chart_init();
-
-        }
 
 
 
@@ -1150,20 +967,7 @@ namespace SerialScreen_ver1
             button_adc_setting.Enabled = true;
         }
 
-        private void checkBox_chart_CheckedChanged(object sender, EventArgs e)
-        {
-            mode_update();
-        }
 
-        private void checkBox_ascii_CheckedChanged(object sender, EventArgs e)
-        {
-            mode_update();
-        }
-
-        private void checkBox_hex_CheckedChanged(object sender, EventArgs e)
-        {
-            mode_update();
-        }
 
         private void comboBox_rxsetting_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1288,6 +1092,36 @@ namespace SerialScreen_ver1
 
         }
 
+        private void button_autoopen_Click(object sender, EventArgs e)
+        {
+            MySerialPort sp_ = new MySerialPort(serialPort1);
+            AutoSelect comAuto = new AutoSelect("stm32f4", sp_);
 
+            buf_settings(3); //データ受取り数を1000byteに設定(500データ)
+        }
+
+        private void button_adcStart_Click(object sender, EventArgs e)
+        {
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Write(adc_start_code);
+            }
+            else
+            {
+                MessageBox.Show("シリアルポートが開いていません。");
+            }
+        }
+
+        private void button_adcStop_Click(object sender, EventArgs e)
+        {
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Write(adc_stop_code);
+            }
+            else
+            {
+                MessageBox.Show("シリアルポートが開いていません。");
+            }
+        }
     }
 }
