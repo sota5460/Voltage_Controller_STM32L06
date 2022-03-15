@@ -14,6 +14,8 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using System.Windows.Forms.DataVisualization.Charting;
 using System.IO;
+using System.Diagnostics;
+
 
 
 
@@ -34,8 +36,16 @@ namespace SerialScreen_ver1
         public byte[] receive_buf; // = new byte[data_num];
         public short[] short_buf; // = new short[data_num / 2];
 
+        public int STM32_ADC_Resolution = 4096;
+        public int STM32_ADC_Threshold = 500;
+        public int STM32_ADC_OnePulseNum = 10; //マイコン側でトリガー入ってから何個サンプルを取得するかの変数。
         public string adc_start_code = "C"; //マイコン側で設定しているadcスタート用コード hexで0x43 ->マイコン側で割り込みありadcとタイマーのスタート
         public string adc_stop_code = "D"; //マイコン側で設定しているadcストップ用コード hexで0x44
+
+        //stopwatch
+        Stopwatch sw = new System.Diagnostics.Stopwatch();
+        TimeSpan span = new TimeSpan(0,0,0);
+        
 
         //
         // ADC Charts variables
@@ -72,10 +82,10 @@ namespace SerialScreen_ver1
 
         public int mca_resolution;
         public int chart_horizon;
-        public int one_pulse_num = 10;
+        
         public int shadow_cnt = 0;
 
-        public int[] mca_result0; // max value out of ONE_PULSE_NUM
+        public int[] mca_result0; // max value out of  STM32_ADC_OnePulseNum
         public int[] mca_result1;
         public int[] mca_result2;
 
@@ -125,13 +135,6 @@ namespace SerialScreen_ver1
         }
 
 
-        /// <summary>
-        /// csv variables
-        /// </summary>
-        /// <param name="txt"></param>
-
-        string csv_name = "csv_1";
-
         //
         // delegate 
         //
@@ -159,17 +162,6 @@ namespace SerialScreen_ver1
 
         public void init_manual()
         {
-            // combobox_initial select
-            //comboBox_BufThresh.SelectedIndex = 1;
-            //comboBox_baudrate.SelectedIndex = 0;
-            //comboBox_rxsetting.SelectedIndex = 0;
-            
-            comboBox_horizon.SelectedIndex = 0;
-            comboBox_adc_res.SelectedIndex = 0;
-            comboBox_pulse_num.SelectedIndex = 10;
-            comboBox_BufThresh.SelectedIndex = 5;
-
-
             button_close.Enabled = false;
             button_adcStart.Enabled = false;
             button_adcStop.Enabled = false;
@@ -178,6 +170,14 @@ namespace SerialScreen_ver1
 
             label_adc_threshold_dis.Visible = false;
 
+            textBox_pulse_num.Text = STM32_ADC_OnePulseNum.ToString();
+            textBox_threshold.Text = STM32_ADC_Threshold.ToString();
+
+            
+            //mca横ラベルの初期化
+            label_TotalCountingTime.Text = span.ToString(@"hh\:mm\:ss");
+            label_total_count_mca.Text = 0.ToString();
+            label_peak_mca.Text = "横軸：" +0.ToString() + "\n縦軸：" + 0.ToString();
 
         }
 
@@ -261,7 +261,8 @@ namespace SerialScreen_ver1
 
 
 
-
+                //mcaをオンにしたときの処理。
+                //処理が重いので、3スレッド使用して、mca_total_buf（最終的なヒストグラムのデータ）を生成する。グラフはmca_total_bufを読んでるだけ。
                 if (mca_flag == 1)
                 {
                     switch (shadow_cnt)
@@ -343,6 +344,8 @@ namespace SerialScreen_ver1
                 adc.Points.AddXY(i + 1, result[i]);
             }
             chart1.Series.Add(adc);
+
+
         }
 
 
@@ -420,14 +423,16 @@ namespace SerialScreen_ver1
         public void chart_MCA_init()
         {
             //adcの分解能
-            mca_resolution_setting(comboBox_adc_res.SelectedIndex);
-            mca_hist_init(mca_resolution);
-            mca_integration_init();
+            //mca_resolution_setting(comboBox_adc_res.SelectedIndex);
+            mca_resolution = STM32_ADC_Resolution;
+
+            //mcaヒストグラム作成用のデータ一時保存用配列mca_histを初期化
+            //mca_hist_init(mca_resolution);
+            mca_arrays_init(mca_resolution);
 
             //グラフの初期化　グラフを一旦全部消す。⇒再度追加（mca_chart_area）
             chart_MCA.ChartAreas.Clear();
             chart_MCA.Series.Clear();
-
             chart_MCA.ChartAreas.Add(mca_chart_area);
 
 
@@ -444,6 +449,7 @@ namespace SerialScreen_ver1
             //mcaの結果格納用配列に０を入れる。
             mca_hist_zero(mca_total_buf);
 
+            //横軸を修正するとき用。デフォルトだと4096（12bit）になってる。
             adjust_horizon_chart_init(mca_total_buf);
 
             for (int i = 0; i < mca_hist_adjusted.Length; i++)
@@ -454,6 +460,8 @@ namespace SerialScreen_ver1
             chart_MCA.Series.Add(mca_chart);
         }
 
+
+        //タイマーで定期的に呼ばれる。
         public void mca_chart_update(int[] mca_hist)
         {
             //mca_hist_adjusted = new int[chart_horizon];
@@ -468,16 +476,29 @@ namespace SerialScreen_ver1
                 mca_chart.Points.AddXY(i + 1, mca_hist_adjusted[i]);
             }
             chart_MCA.Series.Add(mca_chart);
+
+            ///ラベルとかの更新
+            ///
+            //総カウント数の表示
+            label_total_count_mca.Text = mca_hist_adjusted.Sum().ToString();
+            //最大カウント数の表示
+            int max_vertical_count = mca_hist_adjusted.Max();
+
+            int max_horizontal_adc_resolutioin = calculate_max_index_adjust_hist(max_vertical_count);
+
+            label_peak_mca.Text = "横軸：" + max_horizontal_adc_resolutioin.ToString() + "\n縦軸：" + max_vertical_count.ToString();
         }
 
         public void adjust_horizon_chart_init(int[] mca_hist)
         {
             int adjust_num;
 
-            chart_horizon_setting(comboBox_horizon.SelectedIndex);
-
+            //横軸の値を設定する。 基本的には横軸（chart_horizon）はADCの分解能と一致する。
+            chart_horizon = STM32_ADC_Resolution;
+            //chart_horizon_setting(comboBox_horizon.SelectedIndex);
             mca_hist_adjusted = new int[chart_horizon];
 
+            //補正用の値
             adjust_num = mca_resolution / chart_horizon;
 
             for(int i = 0; i < chart_horizon; i++)
@@ -505,27 +526,36 @@ namespace SerialScreen_ver1
             }
         }
 
-        public void make_shadow(short[] shadow_array,short[] target)
+        public int calculate_max_index_adjust_hist(int max_value)
         {
-            if(shadow_array.Length != target.Length)
+            int return_index = 0;
+
+            for(int i = 0; i < mca_hist_adjusted.Length; i++)
             {
-                MessageBox.Show("size is not right. shadow array and target array ");
+                if(max_value == mca_hist_adjusted[i])
+                {
+                    return_index = i;
+                   
+                }
             }
 
-            for(int i = 0; i < shadow_array.Length; i++)
-            {
-                shadow_array[i] = target[i];
-            }
+            return return_index;
         }
-        //1つのパルスの最大値を格納する配列mca_result、adcの生データ一時保存用配列mca_shortbuf_shadow、mcaの結果mca_total_bufを初期化する。
-        public void mca_integration_init()
+
+
+        //1つのパルスの最大値を格納する配列mca_result、adcの生データ一時保存用配列mca_shortbuf_shadow、mcaの結果mca_total_buf, ヒストグラム一時保存データmca_histを初期化する。
+        //mcaのヒストグラムを作るための配列をまとめて初期化できる。
+        public void mca_arrays_init(int mca_hist_num)
         {
+            mca_hist0 = new int[mca_hist_num];
+            mca_hist1 = new int[mca_hist_num];
+            mca_hist2 = new int[mca_hist_num];
 
-            //mca_result_init(short_buf.Length / one_pulse_num);
+            //mca_result_init(short_buf.Length /  STM32_ADC_OnePulseNum);
 
-            mca_result0 = new int[short_buf.Length / one_pulse_num];
-            mca_result1 = new int[short_buf.Length / one_pulse_num];
-            mca_result2 = new int[short_buf.Length / one_pulse_num];
+            mca_result0 = new int[short_buf.Length /  STM32_ADC_OnePulseNum];
+            mca_result1 = new int[short_buf.Length /  STM32_ADC_OnePulseNum];
+            mca_result2 = new int[short_buf.Length /  STM32_ADC_OnePulseNum];
 
             mca_shortbuf_shadow0 = new short[short_buf.Length];
             mca_shortbuf_shadow1 = new short[short_buf.Length];
@@ -533,6 +563,23 @@ namespace SerialScreen_ver1
 
             mca_total_buf = new int[mca_resolution];
         }
+
+
+        //シリアル通信受取ったときの割り込みで呼ばれる関数。
+        public void make_shadow(short[] shadow_array, short[] target)
+        {
+            if (shadow_array.Length != target.Length)
+            {
+                MessageBox.Show("size is not right. shadow array and target array ");
+            }
+
+            for (int i = 0; i < shadow_array.Length; i++)
+            {
+                shadow_array[i] = target[i];
+            }
+        }
+
+        //シリアル通信受取ったときの割り込みで呼ばれる関数。
         public void mca_integration(int[] mca_hist)
         {
             for(int i = 0; i < mca_resolution; i++)
@@ -543,7 +590,7 @@ namespace SerialScreen_ver1
         }
 
 
-
+        //シリアル通信受取ったときの割り込みで呼ばれる関数。
         public void mca_thread_function(int shadow_cnt)
         {
            
@@ -551,122 +598,32 @@ namespace SerialScreen_ver1
             switch (shadow_cnt)
             {
                 case (0):
-                    mca_result0 = new int[short_buf.Length / one_pulse_num];
+                    mca_result0 = new int[short_buf.Length /  STM32_ADC_OnePulseNum];
                     mca_hist0 = new int[mca_resolution];
-                    MCA_Data_Organizer(mca_result0, mca_shortbuf_shadow0, mca_shortbuf_shadow0.Length, one_pulse_num);
+                    MCA_Data_Organizer(mca_result0, mca_shortbuf_shadow0, mca_shortbuf_shadow0.Length,  STM32_ADC_OnePulseNum);
                     Histgram_Data_Organizer(mca_hist0, mca_result0);
                     mca_integration(mca_hist0);
                     break;
                 case (1):
-                    mca_result1 = new int[short_buf.Length / one_pulse_num];
+                    mca_result1 = new int[short_buf.Length /  STM32_ADC_OnePulseNum];
                     mca_hist1 = new int[mca_resolution];
-                    MCA_Data_Organizer(mca_result1, mca_shortbuf_shadow1, mca_shortbuf_shadow1.Length, one_pulse_num);
+                    MCA_Data_Organizer(mca_result1, mca_shortbuf_shadow1, mca_shortbuf_shadow1.Length,  STM32_ADC_OnePulseNum);
                     Histgram_Data_Organizer(mca_hist1, mca_result1);
                     mca_integration(mca_hist1);
                     break;
                 case (2):
-                    mca_result2 = new int[short_buf.Length / one_pulse_num];
+                    mca_result2 = new int[short_buf.Length /  STM32_ADC_OnePulseNum];
                     mca_hist2 = new int[mca_resolution];
-                    MCA_Data_Organizer(mca_result2, mca_shortbuf_shadow2, mca_shortbuf_shadow2.Length, one_pulse_num);
+                    MCA_Data_Organizer(mca_result2, mca_shortbuf_shadow2, mca_shortbuf_shadow2.Length,  STM32_ADC_OnePulseNum);
                     Histgram_Data_Organizer(mca_hist2, mca_result2);
                     mca_integration(mca_hist2);
                     break;
             }
         }
       
-        /// 
-        //MCA end.
-        //
 
 
 
-        /// <summary>
-        /// MCU_Setting_Methods
-        /// you can set the mcu parameter by sending codes.
-        /// </summary>
-        public void setting_start_mcu()
-        {
-            if (serialPort1.IsOpen)
-            {
-                serialPort1.Write("G");
-            }
-        }
-
-        public void setting_end_mcu()
-        {
-            if (serialPort1.IsOpen)
-            {
-                serialPort1.Write("D"+"DDDD"); // you need to send 5 bytes.
-            }
-        }
-
-        public void setting_mcu_parameter_threshold(int param_value)
-        {
-            if (serialPort1.IsOpen)
-            {
-                serialPort1.Write("B"+int_parameter_to_string(param_value));
-
-            }
-        }
-
-        public void setting_mcu_parameter_samplenum(int param_value)
-        {
-            if (serialPort1.IsOpen)
-            {
-                serialPort1.Write("C" + int_parameter_to_string(param_value));
-
-            }
-        }
-
-        public string int_parameter_to_string(int int_value)
-        {
-
-            string value_string = int_value.ToString("0000");
-
-            return value_string;
-        }
-
-        private void button_mca_setting_display_Click(object sender, EventArgs e)
-        {
-            panel_mca_setting.Enabled = true;
-            panel_mca_setting.Visible = true;
-
-            button_mca_setting_display.Enabled = false;
-        }
-
-        private void button_MCA_ON_Click(object sender, EventArgs e)
-        {
-            button_MCA_ON.Enabled = false;
-            button_MCA_OFF.Enabled = true;
-            button_mca_setting_display.Enabled = false;
-            button_csv_out.Enabled = true;
-
-            mca_flag = 1;
-            chart_MCA_init();
-            //mca_integration_init();
-        }
-
-        private void button_mca_setting_Click(object sender, EventArgs e)
-        {
-
-            one_pulse_num =comboBox_pulse_num.SelectedIndex;
-            mca_resolution_setting(comboBox_adc_res.SelectedIndex);
-            csv_name = textBox_csv_name.Text;
-
-            panel_mca_setting.Enabled = false;
-            panel_mca_setting.Visible = false;
-
-            button_mca_setting_display.Enabled = true;
-        }
-
-        private void button_MCA_OFF_Click(object sender, EventArgs e)
-        {
-            button_MCA_ON.Enabled = true;
-            button_MCA_OFF.Enabled = false;
-            button_mca_setting_display.Enabled = true;
-
-            mca_flag = 0;
-        }
 
         private void Interval_function(object sender, EventArgs e)
         {
@@ -676,14 +633,6 @@ namespace SerialScreen_ver1
             }
         }
 
-        private void comboBox_horizon_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            chart_horizon_setting(comboBox_horizon.SelectedIndex);
-
-            mca_hist_adjusted = new int[chart_horizon];
-
-
-        }
 
         private void button_mca_clear_Click(object sender, EventArgs e)
         {
@@ -709,33 +658,30 @@ namespace SerialScreen_ver1
             MessageBox.Show(buf_left.ToString() + "bytes is deleted");
         }
 
-        private void button_adc_setting_Click(object sender, EventArgs e)
-        {
-            panel_adc_setting.Enabled = true;
-            panel_adc_setting.Visible = true;
-
-            button_adc_setting.Enabled = false;
-        }
-
-        private void button_adc_setting_off_Click(object sender, EventArgs e)
-        {
-            panel_adc_setting.Enabled = false;
-            panel_adc_setting.Visible = false;
-
-            button_adc_setting.Enabled = true;
-        }
-
         private void button_csv_out_Click(object sender, EventArgs e)
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog() { FileName = "SelectFolder", Filter = "Folder|.", CheckFileExists = false };
 
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            save_mca_csv_file();
+
+        }
+
+        private void save_mca_csv_file()
+        {
+
+            //SaveFileDialogを生成する
+            SaveFileDialog sa = new SaveFileDialog();
+            sa.Title = "ファイルを保存する";
+            sa.InitialDirectory = @"C:\";
+            sa.FileName = @"mca_data.csv";
+            //sa.Filter = "テキストファイル(*.txt;*.text)|*.txt;*.text|すべてのファイル(*.*)|*.*";
+            sa.FilterIndex = 1;
+            DialogResult result = sa.ShowDialog();
+
+            if (result == DialogResult.OK)
             {
-
-                string folderpath = Path.GetDirectoryName(openFileDialog.FileName);
-                string filename = csv_name;
-
-                StreamWriter file = new StreamWriter(folderpath + "\\" + filename, false, Encoding.UTF8);
+                //「保存」ボタンが押された時の処理
+                string fileName = sa.FileName;  //こんな感じで指定されたファイルのパスが取得できる
+                StreamWriter file = new StreamWriter(fileName, false, Encoding.UTF8);
                 for (int i = 0; i < mca_total_buf.Length; i++)
                 {
                     file.WriteLine(string.Format("{0},{1}", i, mca_total_buf[i]));
@@ -744,51 +690,13 @@ namespace SerialScreen_ver1
                 file.Close();
 
                 MessageBox.Show("csvファイルを出力しました。");
+
             }
-
-
-        }
-
-        private void button_close_mca_Click(object sender, EventArgs e)
-        {
-            panel_mca_setting.Enabled = false;
-            panel_mca_setting.Visible = false;
-
-            button_mca_setting_display.Enabled = true;
-        }
-
-        private void button_close_adc_Click(object sender, EventArgs e)
-        {
-            panel_adc_setting.Enabled = false;
-            panel_adc_setting.Visible = false;
-
-            button_adc_setting.Enabled = true;
-        }
-
-
-
-        private void comboBox_rxsetting_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            switch (comboBox_rxsetting.SelectedIndex)
+            else if (result == DialogResult.Cancel)
             {
-                case (0):
-                    comboBox_BufThresh.Enabled = true;
-
-                    break;
-                case (1):
-                    comboBox_BufThresh.Enabled = false;
-
-                    break;
-                case (2):
-                    comboBox_BufThresh.Enabled = false;
-
-                    break;
+                //「キャンセル」ボタンまたは「×」ボタンが選択された時の処理
             }
         }
-
-
-
-
 
 
 
@@ -836,14 +744,31 @@ namespace SerialScreen_ver1
                 return;
             };
 
-            await Task.Delay(100);
-            setting_mcu_parameter_threshold(threshold_send_value);
+           
 
-            await Task.Delay(100);
-            setting_mcu_parameter_samplenum(one_pulse_sample_num);
+        }
 
-            await Task.Delay(100);
-            setting_end_mcu();
+        private void Send_ADCSettingCodetoSTM32()
+        {
+            int threshold_send_value = Convert.ToInt32(textBox_threshold.Text);
+            if (threshold_send_value > 4095 || threshold_send_value == 0)
+            {
+                MessageBox.Show("閾値が正しくありません。");
+                return;
+            };
+
+            int one_pulse_sample_num = Convert.ToInt32(textBox_pulse_num.Text);
+            if (one_pulse_sample_num == 0)
+            {
+                MessageBox.Show("1パルスのサンプル数が正しくありません。");
+                return;
+            };
+
+            if (serialPort1.IsOpen)
+            {
+                serialPort1.Write("G" + threshold_send_value.ToString("0000") + one_pulse_sample_num.ToString("0000")); //設定するときのコード　1byte目:"G",  2-5byte目:閾値を文字列4byte（例"0500"）,6-9byte目: 一つのパルスあたりのデータ数を文字列4byte
+
+            }
 
         }
 
@@ -913,6 +838,51 @@ namespace SerialScreen_ver1
         private void textBox_threshold_MouseLeave(object sender, EventArgs e)
         {
             label_adc_threshold_dis.Visible = false;
+        }
+
+        private void button_MCA_ON_Click(object sender, EventArgs e)
+        {
+            button_MCA_ON.Enabled = false;
+            button_MCA_OFF.Enabled = true;
+            button_csv_out.Enabled = true;
+
+            mca_flag = 1;
+            chart_MCA_init();
+            //mca_integration_init();
+
+            sw.Start();
+            timer_stopwatch.Enabled = true;
+        }
+
+        private void button_MCA_OFF_Click(object sender, EventArgs e)
+        {
+            button_MCA_ON.Enabled = true;
+            button_MCA_OFF.Enabled = false;
+
+            mca_flag = 0;
+
+            sw.Stop();
+            timer_stopwatch.Enabled = false;
+        }
+
+        private void button_adcsetting1_Click(object sender, EventArgs e)
+        {
+            Send_ADCSettingCodetoSTM32();
+        }
+
+        private void button_adcsetting2_Click(object sender, EventArgs e)
+        {
+            Send_ADCSettingCodetoSTM32();
+        }
+
+        private void timer_stopwatch_Tick(object sender, EventArgs e)
+        {
+
+            int mca_time_seconds =(int) sw.ElapsedMilliseconds / 1000;
+            span = new TimeSpan(0,0,mca_time_seconds);
+            
+            label_TotalCountingTime.Text = span.ToString(@"hh\:mm\:ss");
+            
         }
     }
 
