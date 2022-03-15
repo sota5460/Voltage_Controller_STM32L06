@@ -79,30 +79,29 @@ namespace SerialScreen_ver1
             this.button_adc_setting_off = new System.Windows.Forms.Button();
             this.label6 = new System.Windows.Forms.Label();
             this.button_csv_out = new System.Windows.Forms.Button();
-            this.mcu_setting_btn = new System.Windows.Forms.Button();
-            this.mcu_setting_panel = new System.Windows.Forms.Panel();
+            this.button_mcu_setting_on = new System.Windows.Forms.Button();
             this.clear_one_samplenum_btn = new System.Windows.Forms.Button();
             this.clear_thresh_btn = new System.Windows.Forms.Button();
             this.label_adc_threshold_dis = new System.Windows.Forms.Label();
-            this.button_mcu_setting_panel_off = new System.Windows.Forms.Button();
-            this.button_mcu_setting_on = new System.Windows.Forms.Button();
             this.textBox_pulse_num = new System.Windows.Forms.TextBox();
             this.label_adc_sample_num = new System.Windows.Forms.Label();
             this.label_adc_threshold = new System.Windows.Forms.Label();
             this.textBox_threshold = new System.Windows.Forms.TextBox();
-            this.label8 = new System.Windows.Forms.Label();
             this.button_autoopen = new System.Windows.Forms.Button();
             this.button_adcStart = new System.Windows.Forms.Button();
             this.button_adcStop = new System.Windows.Forms.Button();
             this.panel2 = new System.Windows.Forms.Panel();
             this.panel3 = new System.Windows.Forms.Panel();
+            this.label_peak_mca = new System.Windows.Forms.Label();
+            this.label_total_count_mca = new System.Windows.Forms.Label();
+            this.label_TotalCountingTime = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             this.panel1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chart_MCA)).BeginInit();
             this.panel_mca_setting.SuspendLayout();
             this.panel_adc_setting.SuspendLayout();
-            this.mcu_setting_panel.SuspendLayout();
             this.panel2.SuspendLayout();
+            this.panel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -143,7 +142,7 @@ namespace SerialScreen_ver1
             series1.Points.Add(dataPoint2);
             series1.YValuesPerPoint = 4;
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(823, 527);
+            this.chart1.Size = new System.Drawing.Size(829, 527);
             this.chart1.TabIndex = 7;
             this.chart1.Text = "chart1";
             // 
@@ -162,7 +161,7 @@ namespace SerialScreen_ver1
             this.panel1.Controls.Add(this.label2);
             this.panel1.Controls.Add(this.comboBox_rxsetting);
             this.panel1.Controls.Add(this.comboBox_baudrate);
-            this.panel1.Location = new System.Drawing.Point(1256, 233);
+            this.panel1.Location = new System.Drawing.Point(180, 15);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(371, 135);
             this.panel1.TabIndex = 16;
@@ -465,7 +464,7 @@ namespace SerialScreen_ver1
             // 
             // button_mca_clear
             // 
-            this.button_mca_clear.Location = new System.Drawing.Point(487, 469);
+            this.button_mca_clear.Location = new System.Drawing.Point(474, 233);
             this.button_mca_clear.Name = "button_mca_clear";
             this.button_mca_clear.Size = new System.Drawing.Size(75, 23);
             this.button_mca_clear.TabIndex = 31;
@@ -547,37 +546,19 @@ namespace SerialScreen_ver1
             this.button_csv_out.UseVisualStyleBackColor = true;
             this.button_csv_out.Click += new System.EventHandler(this.button_csv_out_Click);
             // 
-            // mcu_setting_btn
+            // button_mcu_setting_on
             // 
-            this.mcu_setting_btn.Location = new System.Drawing.Point(559, 15);
-            this.mcu_setting_btn.Name = "mcu_setting_btn";
-            this.mcu_setting_btn.Size = new System.Drawing.Size(124, 34);
-            this.mcu_setting_btn.TabIndex = 38;
-            this.mcu_setting_btn.Text = "マイコンの詳細設定";
-            this.mcu_setting_btn.UseVisualStyleBackColor = true;
-            this.mcu_setting_btn.Click += new System.EventHandler(this.mcu_setting_btn_Click);
-            // 
-            // mcu_setting_panel
-            // 
-            this.mcu_setting_panel.BackColor = System.Drawing.SystemColors.ButtonFace;
-            this.mcu_setting_panel.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.mcu_setting_panel.Controls.Add(this.clear_one_samplenum_btn);
-            this.mcu_setting_panel.Controls.Add(this.clear_thresh_btn);
-            this.mcu_setting_panel.Controls.Add(this.label_adc_threshold_dis);
-            this.mcu_setting_panel.Controls.Add(this.button_mcu_setting_panel_off);
-            this.mcu_setting_panel.Controls.Add(this.button_mcu_setting_on);
-            this.mcu_setting_panel.Controls.Add(this.textBox_pulse_num);
-            this.mcu_setting_panel.Controls.Add(this.label_adc_sample_num);
-            this.mcu_setting_panel.Controls.Add(this.label_adc_threshold);
-            this.mcu_setting_panel.Controls.Add(this.textBox_threshold);
-            this.mcu_setting_panel.Location = new System.Drawing.Point(3, 3);
-            this.mcu_setting_panel.Name = "mcu_setting_panel";
-            this.mcu_setting_panel.Size = new System.Drawing.Size(320, 142);
-            this.mcu_setting_panel.TabIndex = 40;
+            this.button_mcu_setting_on.Location = new System.Drawing.Point(15, 120);
+            this.button_mcu_setting_on.Name = "button_mcu_setting_on";
+            this.button_mcu_setting_on.Size = new System.Drawing.Size(115, 23);
+            this.button_mcu_setting_on.TabIndex = 33;
+            this.button_mcu_setting_on.Text = "決定";
+            this.button_mcu_setting_on.UseVisualStyleBackColor = true;
+            this.button_mcu_setting_on.Click += new System.EventHandler(this.button_mcu_setting_on_Click);
             // 
             // clear_one_samplenum_btn
             // 
-            this.clear_one_samplenum_btn.Location = new System.Drawing.Point(233, 66);
+            this.clear_one_samplenum_btn.Location = new System.Drawing.Point(74, 91);
             this.clear_one_samplenum_btn.Name = "clear_one_samplenum_btn";
             this.clear_one_samplenum_btn.Size = new System.Drawing.Size(56, 23);
             this.clear_one_samplenum_btn.TabIndex = 42;
@@ -587,8 +568,8 @@ namespace SerialScreen_ver1
             // 
             // clear_thresh_btn
             // 
-            this.clear_thresh_btn.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.clear_thresh_btn.Location = new System.Drawing.Point(181, 4);
+            this.clear_thresh_btn.Font = new System.Drawing.Font("MS UI Gothic", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.clear_thresh_btn.Location = new System.Drawing.Point(74, 30);
             this.clear_thresh_btn.Name = "clear_thresh_btn";
             this.clear_thresh_btn.Size = new System.Drawing.Size(56, 23);
             this.clear_thresh_btn.TabIndex = 41;
@@ -601,37 +582,17 @@ namespace SerialScreen_ver1
             this.label_adc_threshold_dis.AutoSize = true;
             this.label_adc_threshold_dis.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
             this.label_adc_threshold_dis.Font = new System.Drawing.Font("MS UI Gothic", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_adc_threshold_dis.Location = new System.Drawing.Point(180, 39);
+            this.label_adc_threshold_dis.Location = new System.Drawing.Point(12, 54);
             this.label_adc_threshold_dis.Name = "label_adc_threshold_dis";
             this.label_adc_threshold_dis.Size = new System.Drawing.Size(109, 16);
             this.label_adc_threshold_dis.TabIndex = 40;
             this.label_adc_threshold_dis.Text = "0-4095を入力";
             // 
-            // button_mcu_setting_panel_off
-            // 
-            this.button_mcu_setting_panel_off.Location = new System.Drawing.Point(84, 99);
-            this.button_mcu_setting_panel_off.Name = "button_mcu_setting_panel_off";
-            this.button_mcu_setting_panel_off.Size = new System.Drawing.Size(75, 23);
-            this.button_mcu_setting_panel_off.TabIndex = 34;
-            this.button_mcu_setting_panel_off.Text = "閉じる";
-            this.button_mcu_setting_panel_off.UseVisualStyleBackColor = true;
-            this.button_mcu_setting_panel_off.Click += new System.EventHandler(this.button_mcu_setting_panel_off_Click);
-            // 
-            // button_mcu_setting_on
-            // 
-            this.button_mcu_setting_on.Location = new System.Drawing.Point(174, 99);
-            this.button_mcu_setting_on.Name = "button_mcu_setting_on";
-            this.button_mcu_setting_on.Size = new System.Drawing.Size(115, 23);
-            this.button_mcu_setting_on.TabIndex = 33;
-            this.button_mcu_setting_on.Text = "すべての設定を反映";
-            this.button_mcu_setting_on.UseVisualStyleBackColor = true;
-            this.button_mcu_setting_on.Click += new System.EventHandler(this.button_mcu_setting_on_Click);
-            // 
             // textBox_pulse_num
             // 
-            this.textBox_pulse_num.Location = new System.Drawing.Point(154, 66);
+            this.textBox_pulse_num.Location = new System.Drawing.Point(8, 91);
             this.textBox_pulse_num.Name = "textBox_pulse_num";
-            this.textBox_pulse_num.Size = new System.Drawing.Size(73, 19);
+            this.textBox_pulse_num.Size = new System.Drawing.Size(62, 19);
             this.textBox_pulse_num.TabIndex = 32;
             this.textBox_pulse_num.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox_pulse_num_KeyPress);
             // 
@@ -639,7 +600,7 @@ namespace SerialScreen_ver1
             // 
             this.label_adc_sample_num.AutoSize = true;
             this.label_adc_sample_num.Font = new System.Drawing.Font("MS UI Gothic", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_adc_sample_num.Location = new System.Drawing.Point(25, 66);
+            this.label_adc_sample_num.Location = new System.Drawing.Point(7, 73);
             this.label_adc_sample_num.Name = "label_adc_sample_num";
             this.label_adc_sample_num.Size = new System.Drawing.Size(123, 15);
             this.label_adc_sample_num.TabIndex = 31;
@@ -648,34 +609,23 @@ namespace SerialScreen_ver1
             // label_adc_threshold
             // 
             this.label_adc_threshold.AutoSize = true;
-            this.label_adc_threshold.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label_adc_threshold.Location = new System.Drawing.Point(15, 10);
+            this.label_adc_threshold.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label_adc_threshold.Location = new System.Drawing.Point(27, 13);
             this.label_adc_threshold.Name = "label_adc_threshold";
-            this.label_adc_threshold.Size = new System.Drawing.Size(81, 14);
+            this.label_adc_threshold.Size = new System.Drawing.Size(74, 14);
             this.label_adc_threshold.TabIndex = 29;
             this.label_adc_threshold.Text = "ADCトリガー";
-            this.label_adc_threshold.MouseLeave += new System.EventHandler(this.label_adc_threshold_MouseLeave);
-            this.label_adc_threshold.MouseHover += new System.EventHandler(this.label_adc_threshold_MouseHover);
             // 
             // textBox_threshold
             // 
             this.textBox_threshold.Font = new System.Drawing.Font("MS UI Gothic", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.textBox_threshold.Location = new System.Drawing.Point(102, 5);
+            this.textBox_threshold.Location = new System.Drawing.Point(8, 30);
             this.textBox_threshold.Name = "textBox_threshold";
-            this.textBox_threshold.Size = new System.Drawing.Size(73, 21);
+            this.textBox_threshold.Size = new System.Drawing.Size(62, 21);
             this.textBox_threshold.TabIndex = 30;
             this.textBox_threshold.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox_threshold_KeyPress);
-            // 
-            // label8
-            // 
-            this.label8.AutoSize = true;
-            this.label8.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.label8.Font = new System.Drawing.Font("MS UI Gothic", 11F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
-            this.label8.Location = new System.Drawing.Point(418, 32);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(88, 17);
-            this.label8.TabIndex = 29;
-            this.label8.Text = "マイコン設定";
+            this.textBox_threshold.MouseLeave += new System.EventHandler(this.textBox_threshold_MouseLeave);
+            this.textBox_threshold.MouseHover += new System.EventHandler(this.textBox_threshold_MouseHover);
             // 
             // button_autoopen
             // 
@@ -716,9 +666,7 @@ namespace SerialScreen_ver1
             // 
             this.panel2.BackColor = System.Drawing.SystemColors.ButtonShadow;
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.panel2.Controls.Add(this.mcu_setting_panel);
-            this.panel2.Controls.Add(this.label8);
-            this.panel2.Controls.Add(this.mcu_setting_btn);
+            this.panel2.Controls.Add(this.panel1);
             this.panel2.Location = new System.Drawing.Point(590, 562);
             this.panel2.Name = "panel2";
             this.panel2.Size = new System.Drawing.Size(823, 152);
@@ -726,20 +674,60 @@ namespace SerialScreen_ver1
             // 
             // panel3
             // 
-            this.panel3.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel3.Location = new System.Drawing.Point(1253, 82);
+            this.panel3.BackColor = System.Drawing.Color.Transparent;
+            this.panel3.Controls.Add(this.label_adc_threshold_dis);
+            this.panel3.Controls.Add(this.button_mcu_setting_on);
+            this.panel3.Controls.Add(this.clear_one_samplenum_btn);
+            this.panel3.Controls.Add(this.label_adc_threshold);
+            this.panel3.Controls.Add(this.clear_thresh_btn);
+            this.panel3.Controls.Add(this.textBox_threshold);
+            this.panel3.Controls.Add(this.label_adc_sample_num);
+            this.panel3.Controls.Add(this.textBox_pulse_num);
+            this.panel3.Location = new System.Drawing.Point(1276, 82);
             this.panel3.Name = "panel3";
-            this.panel3.Size = new System.Drawing.Size(144, 90);
+            this.panel3.Size = new System.Drawing.Size(133, 249);
             this.panel3.TabIndex = 45;
+            // 
+            // label_peak_mca
+            // 
+            this.label_peak_mca.AutoSize = true;
+            this.label_peak_mca.Font = new System.Drawing.Font("MS UI Gothic", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label_peak_mca.Location = new System.Drawing.Point(470, 111);
+            this.label_peak_mca.Name = "label_peak_mca";
+            this.label_peak_mca.Size = new System.Drawing.Size(97, 20);
+            this.label_peak_mca.TabIndex = 46;
+            this.label_peak_mca.Text = "peak_mca";
+            // 
+            // label_total_count_mca
+            // 
+            this.label_total_count_mca.AutoSize = true;
+            this.label_total_count_mca.Font = new System.Drawing.Font("MS UI Gothic", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label_total_count_mca.Location = new System.Drawing.Point(472, 152);
+            this.label_total_count_mca.Name = "label_total_count_mca";
+            this.label_total_count_mca.Size = new System.Drawing.Size(112, 20);
+            this.label_total_count_mca.TabIndex = 47;
+            this.label_total_count_mca.Text = "TotalCount";
+            // 
+            // label_TotalCountingTime
+            // 
+            this.label_TotalCountingTime.AutoSize = true;
+            this.label_TotalCountingTime.Font = new System.Drawing.Font("MS UI Gothic", 15F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(128)));
+            this.label_TotalCountingTime.Location = new System.Drawing.Point(472, 192);
+            this.label_TotalCountingTime.Name = "label_TotalCountingTime";
+            this.label_TotalCountingTime.Size = new System.Drawing.Size(102, 20);
+            this.label_TotalCountingTime.TabIndex = 48;
+            this.label_TotalCountingTime.Text = "TotalTime";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.SystemColors.ControlLightLight;
+            this.BackColor = System.Drawing.SystemColors.ButtonFace;
             this.ClientSize = new System.Drawing.Size(1425, 721);
+            this.Controls.Add(this.label_TotalCountingTime);
+            this.Controls.Add(this.label_total_count_mca);
+            this.Controls.Add(this.label_peak_mca);
             this.Controls.Add(this.panel3);
-            this.Controls.Add(this.panel1);
             this.Controls.Add(this.panel2);
             this.Controls.Add(this.button_adcStop);
             this.Controls.Add(this.button_adcStart);
@@ -773,10 +761,9 @@ namespace SerialScreen_ver1
             this.panel_mca_setting.PerformLayout();
             this.panel_adc_setting.ResumeLayout(false);
             this.panel_adc_setting.PerformLayout();
-            this.mcu_setting_panel.ResumeLayout(false);
-            this.mcu_setting_panel.PerformLayout();
             this.panel2.ResumeLayout(false);
-            this.panel2.PerformLayout();
+            this.panel3.ResumeLayout(false);
+            this.panel3.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -786,13 +773,7 @@ namespace SerialScreen_ver1
         {
            
 
-            string[] ports = SerialPort.GetPortNames();
-            foreach (string port in ports)
-            {
-                comboBox_com.Items.Add(port);
-            }
-            if (comboBox_com.Items.Count > 0)
-                comboBox_com.SelectedIndex = 0;
+
         }
 
         #endregion
@@ -834,10 +815,6 @@ namespace SerialScreen_ver1
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Button button_close_mca;
         private System.Windows.Forms.Button button_close_adc;
-        private System.Windows.Forms.Button mcu_setting_btn;
-        private System.Windows.Forms.Panel mcu_setting_panel;
-        private System.Windows.Forms.Label label8;
-        private System.Windows.Forms.Button button_mcu_setting_panel_off;
         private System.Windows.Forms.Button button_mcu_setting_on;
         private System.Windows.Forms.TextBox textBox_pulse_num;
         private System.Windows.Forms.Label label_adc_sample_num;
@@ -851,6 +828,9 @@ namespace SerialScreen_ver1
         private System.Windows.Forms.Button button_adcStop;
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Panel panel3;
+        private System.Windows.Forms.Label label_peak_mca;
+        private System.Windows.Forms.Label label_total_count_mca;
+        private System.Windows.Forms.Label label_TotalCountingTime;
     }
 }
 

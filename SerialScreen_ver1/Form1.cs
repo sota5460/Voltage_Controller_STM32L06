@@ -34,8 +34,8 @@ namespace SerialScreen_ver1
         public byte[] receive_buf; // = new byte[data_num];
         public short[] short_buf; // = new short[data_num / 2];
 
-        public string adc_start_code = "C"; //マイコン側で設定しているコード hexで0x43
-        public string adc_stop_code = "D"; //マイコン側で設定しているコード hexで0x44
+        public string adc_start_code = "C"; //マイコン側で設定しているadcスタート用コード hexで0x43 ->マイコン側で割り込みありadcとタイマーのスタート
+        public string adc_stop_code = "D"; //マイコン側で設定しているadcストップ用コード hexで0x44
 
         //
         // ADC Charts variables
@@ -45,52 +45,25 @@ namespace SerialScreen_ver1
         public int adc_diplay_num = 1;
 
         public Series adc1 = new Series();
-        //public Series adc2 = new Series();
-        //public Series adc3 = new Series();
-        //public Series adc4 = new Series();
-        //public Series adc5 = new Series();
-        //public Series adc6 = new Series();
-        //public Series adc7 = new Series();
-        //public Series adc8 = new Series();
-        //public Series adc9 = new Series();
 
-        public void buf_etc_setting(int buf_size)
+        public void buf_settings(int rx_buf_bytesize)
         {
-            data_num = buf_size;
-            receive_buf = new byte[buf_size];
-            if (buf_size % 2 == 0)
-            {
-                short_buf = new short[buf_size / 2];
-            }
-        }
-
-        public void buf_settings(int buf_index)
-        {
-            int temp_buf = 200;
-            switch (buf_index)
-            {
-                case (0):temp_buf = 1; break;
-                case (1):temp_buf = 200;  break;
-                case (2):temp_buf = 500;  break;
-                case (3):temp_buf = 1000; break;
-            }
-
-            data_num = temp_buf;
-            receive_buf = new byte[temp_buf];
-            if (temp_buf % 2 == 0)
+            data_num = rx_buf_bytesize;
+            receive_buf = new byte[rx_buf_bytesize];
+            if (rx_buf_bytesize % 2 == 0)
             {
                 short_buf = new short[data_num / 2];
             }
         }
 
 
-        public void short_buf_init()
-        {
-            for (int i = 0; i < data_num / 2; i++)
-            {
-                short_buf[i] = 0;
-            }
-        }
+        //public void short_buf_init()
+        //{
+        //    for (int i = 0; i < data_num / 2; i++)
+        //    {
+        //        short_buf[i] = 0;
+        //    }
+        //}
 
         //
         // MCA variables or etc
@@ -121,6 +94,7 @@ namespace SerialScreen_ver1
         ChartArea mca_chart_area = new ChartArea("mca_result");
         public Series mca_chart = new Series();
 
+        //mcaグラフの縦軸の設定
         public void mca_resolution_setting(int res)
         {
             switch (res)
@@ -141,12 +115,7 @@ namespace SerialScreen_ver1
             }
         }
 
-        public void mca_result_init(int mca_data_num )
-        {
-            mca_result0 = new int[mca_data_num];
-            mca_result1 = new int[mca_data_num];
-            mca_result2 = new int[mca_data_num];
-        }
+
 
         public void mca_hist_init(int mca_hist_num)
         {
@@ -177,10 +146,11 @@ namespace SerialScreen_ver1
 
         public Form1()
         {
-            short_buf_init();
+            //short_buf_init();
             InitializeComponent();
             init_manual();
 
+            //グラフの初期化しなくても動作するけど、これしとかないとグラフが真っ白になって見た目がよくない。
             chart_init();
             chart_MCA_init();
 
@@ -190,9 +160,9 @@ namespace SerialScreen_ver1
         public void init_manual()
         {
             // combobox_initial select
-            comboBox_BufThresh.SelectedIndex = 1;
-            comboBox_baudrate.SelectedIndex = 0;
-            comboBox_rxsetting.SelectedIndex = 0;
+            //comboBox_BufThresh.SelectedIndex = 1;
+            //comboBox_baudrate.SelectedIndex = 0;
+            //comboBox_rxsetting.SelectedIndex = 0;
             
             comboBox_horizon.SelectedIndex = 0;
             comboBox_adc_res.SelectedIndex = 0;
@@ -200,123 +170,21 @@ namespace SerialScreen_ver1
             comboBox_BufThresh.SelectedIndex = 5;
 
 
-            //disable_btn
             button_close.Enabled = false;
+            button_adcStart.Enabled = false;
+            button_adcStop.Enabled = false;
             button_MCA_ON.Enabled = false;
             button_MCA_OFF.Enabled = false;
-            button_send.Enabled = false;
-            btn_rx_buf_clear.Enabled = false;
-            btn_rx_buf_clear.Visible = false;
-            button_csv_out.Enabled = false;
-            mcu_setting_btn.Enabled = false;
-            mcu_setting_btn.Visible = false;
 
-            //disable combobox
-            comboBox_cmd.Enabled = false;
-
-            //disable checklistbox
-            //checkedListBox_mode.Enabled = false;
-
-            //disable panel 
-            panel_mca_setting.Enabled = false;
-            panel_mca_setting.Visible = false;
-
-            panel_adc_setting.Enabled = false;
-            panel_adc_setting.Visible = false;
-
-            mcu_setting_panel.Visible = false;
-            mcu_setting_panel.Enabled = false;
-        }
-
-
-        private void button_open_Click(object sender, EventArgs e)
-        {
-
-            b_rate = comboBox_baudrate.SelectedIndex;
-            switch (b_rate)
-            {
-                case (0): b_rate = 115200; break;
-                case (1): b_rate = 9600; break;
-            }
-
-            rx_setting = comboBox_rxsetting.SelectedIndex;
-            switch (rx_setting)
-            {
-                case (0): rx_setting = 0; break;
-                case (1): rx_setting = 1; break;
-                case (2): rx_setting = 2; break;
-
-            }
-
-            buf_thresh_setting = comboBox_BufThresh.SelectedIndex;
-            switch(buf_thresh_setting)
-            {
-                case (0):buf_thresh_setting = 1;break;
-                case (1): buf_thresh_setting = 200; break;
-                case (2): buf_thresh_setting = 500; break;
-                case (3): buf_thresh_setting = 1000; break;
-                case (4): buf_thresh_setting = 2000;break;
-                case (5):buf_thresh_setting = 10000;break;
-            }
-
-            buf_etc_setting(buf_thresh_setting);
-
-
-            serialPort1.BaudRate = b_rate;
-            serialPort1.Parity = Parity.None;
-            serialPort1.DataBits = 8;
-            serialPort1.StopBits = StopBits.One;
-            serialPort1.Handshake = Handshake.None;
-            serialPort1.PortName = "COM11";
-            serialPort1.ReceivedBytesThreshold = buf_thresh_setting;
-            serialPort1.Open();
-
-
-            //receive_buffer reset
-            serialPort1.DiscardInBuffer();
-
-            //disable btn or etc
-            button_open.Enabled = false;
-            comboBox_com.Enabled = false;
-            button_close.Enabled = true;
-            button_send.Enabled = true;
-
-            mcu_setting_btn.Visible = true;
-            mcu_setting_btn.Enabled = true;
-
-            btn_rx_buf_clear.Enabled = true;
-            btn_rx_buf_clear.Visible = true;
-
-            comboBox_baudrate.Enabled = false;
-            comboBox_BufThresh.Enabled = false;
-            comboBox_rxsetting.Enabled = false;
-            comboBox_cmd.Enabled = true;
+            label_adc_threshold_dis.Visible = false;
 
 
         }
 
-        private void button_close_Click(object sender, EventArgs e)
-        {
-            serialPort1.Write(adc_stop_code);
 
-            serialPort1.DiscardInBuffer();
+ 
 
-            serialPort1.Close();
 
-            //button_open.Enabled = true;
-            //comboBox_com.Enabled = true;
-            //button_close.Enabled = false;
-            //button_send.Enabled = false;
-            //btn_rx_buf_clear.Enabled = false;
-            //btn_rx_buf_clear.Visible = false;
-
-            //mcu_setting_btn.Enabled = false;
-            //mcu_setting_btn.Visible = false;
-
-            //comboBox_baudrate.Enabled = true;
-            //comboBox_BufThresh.Enabled = true;
-            //comboBox_rxsetting.Enabled = true;
-        }
 
 
 
@@ -329,16 +197,6 @@ namespace SerialScreen_ver1
             }else
             {
                      multi_chart_update(adc1, short_to_int(short_buf, data_num / 2), data_num / 2); 
-                    //case (2): multi_chart_update(adc2, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    //case (3): multi_chart_update(adc3, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    //case (4): multi_chart_update(adc4, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    //case (5): multi_chart_update(adc5, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    //case (6): multi_chart_update(adc6, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    //case (7): multi_chart_update(adc7, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    //case (8): multi_chart_update(adc8, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-                    //case (9): multi_chart_update(adc9, short_to_int(short_buf, data_num / 2), data_num / 2); break;
-
-
             }
 
         }
@@ -441,7 +299,7 @@ namespace SerialScreen_ver1
 
         public void chart_init()
         {
-            buf_settings(comboBox_BufThresh.SelectedIndex);
+            buf_settings(1000);
 
 
             chart1.ChartAreas.Clear();
@@ -454,24 +312,7 @@ namespace SerialScreen_ver1
             // series -> each graph 
             // 1. make new series 2.add property 3. add series to chart  
             adc1.ChartType = SeriesChartType.Line;
-            //adc2.ChartType = SeriesChartType.Line;
-            //adc3.ChartType = SeriesChartType.Line;
-            //adc4.ChartType = SeriesChartType.Line;
-            //adc5.ChartType = SeriesChartType.Line;
-            //adc6.ChartType = SeriesChartType.Line;
-            //adc7.ChartType = SeriesChartType.Line;
-            //adc8.ChartType = SeriesChartType.Line;
-            //adc9.ChartType = SeriesChartType.Line;
-
             adc1.Color = Color.FromArgb(211,96,21) ;
-            //adc2.Color = Color.FromArgb(196,182,69);
-            //adc3.Color = Color.FromArgb(78,115,166);
-            //adc4.Color = Color.FromArgb(123, 78, 166);
-            //adc5.Color = Color.FromArgb(166, 78, 78);
-            //adc6.Color = Color.FromArgb(166, 160, 78);
-            //adc7.Color = Color.FromArgb(90, 155, 78);
-            //adc8.Color = Color.FromArgb(24, 27, 24);
-            //adc9.Color = Color.FromArgb(61, 32, 26);
 
             for (int i = 0; i < data_num/2; i++)
             {
@@ -481,18 +322,10 @@ namespace SerialScreen_ver1
             chart1.Series.Add(adc1);
         }
 
-        //public void chart_points_clear_all()
-        //{
-        //    adc1.Points.Clear();
-        //    //adc2.Points.Clear();
-        //    //adc3.Points.Clear();
-        //    //adc4.Points.Clear();
-        //    //adc5.Points.Clear();
-        //    //adc6.Points.Clear();
-        //    //adc7.Points.Clear();
-        //    //adc8.Points.Clear();
-        //    //adc9.Points.Clear();
-        //}
+        public void chart_points_clear_all()
+        {
+          adc1.Points.Clear();
+        }
 
         public void chart_just_update(Series adc)
         {
@@ -586,11 +419,12 @@ namespace SerialScreen_ver1
 
         public void chart_MCA_init()
         {
-
+            //adcの分解能
             mca_resolution_setting(comboBox_adc_res.SelectedIndex);
             mca_hist_init(mca_resolution);
             mca_integration_init();
 
+            //グラフの初期化　グラフを一旦全部消す。⇒再度追加（mca_chart_area）
             chart_MCA.ChartAreas.Clear();
             chart_MCA.Series.Clear();
 
@@ -607,6 +441,7 @@ namespace SerialScreen_ver1
             //setting color
             mca_chart.Color = Color.FromArgb(78, 115, 166);
 
+            //mcaの結果格納用配列に０を入れる。
             mca_hist_zero(mca_total_buf);
 
             adjust_horizon_chart_init(mca_total_buf);
@@ -682,10 +517,15 @@ namespace SerialScreen_ver1
                 shadow_array[i] = target[i];
             }
         }
-
+        //1つのパルスの最大値を格納する配列mca_result、adcの生データ一時保存用配列mca_shortbuf_shadow、mcaの結果mca_total_bufを初期化する。
         public void mca_integration_init()
         {
-            mca_result_init(short_buf.Length / one_pulse_num);
+
+            //mca_result_init(short_buf.Length / one_pulse_num);
+
+            mca_result0 = new int[short_buf.Length / one_pulse_num];
+            mca_result1 = new int[short_buf.Length / one_pulse_num];
+            mca_result2 = new int[short_buf.Length / one_pulse_num];
 
             mca_shortbuf_shadow0 = new short[short_buf.Length];
             mca_shortbuf_shadow1 = new short[short_buf.Length];
@@ -786,48 +626,6 @@ namespace SerialScreen_ver1
             return value_string;
         }
 
-
-
-        private void button3_Click(object sender, EventArgs e)
-        {
-            string a = comboBox_cmd.SelectedItem.ToString();
-            string send_code="B";
-            switch (a)
-            {
-                case "Hello":
-                    send_code = "E";
-                        break;
-                case "LED_TOGGLE":
-                    send_code = "B";
-                    break;
-                case "ADC_ON":
-                    send_code = "C";
-                    break;
-                case "ADC_OFF":
-                    send_code = "D";
-                    break;
-                case "SINGLE_ADC":
-                    send_code = "F";
-                    break;
-                case "setting":
-                    send_code = "G";
-                    break;
-    
-
-
-            }
-
-            if (serialPort1.IsOpen)
-            {
-                serialPort1.Write(send_code);
-            }
-        }
-
-
-
-
-
-
         private void button_mca_setting_display_Click(object sender, EventArgs e)
         {
             panel_mca_setting.Enabled = true;
@@ -845,7 +643,7 @@ namespace SerialScreen_ver1
 
             mca_flag = 1;
             chart_MCA_init();
-            mca_integration_init();
+            //mca_integration_init();
         }
 
         private void button_mca_setting_Click(object sender, EventArgs e)
@@ -991,34 +789,8 @@ namespace SerialScreen_ver1
 
 
 
-        private void mcu_setting_btn_Click(object sender, EventArgs e)
-        {
-            //setting_mcu_parameter(2000);
-            setting_start_mcu();
 
-            mcu_setting_panel.Enabled = true;
-            mcu_setting_panel.Visible = true;
 
-            label_adc_threshold_dis.Visible = false;
-            
-
-            mcu_setting_btn.Enabled = false;
-            button_send.Enabled = false;
-            comboBox_cmd.Enabled = false;
-        }
-
-        private void button_mcu_setting_panel_off_Click(object sender, EventArgs e)
-        {
-            setting_end_mcu();
-
-            mcu_setting_panel.Enabled = false;
-            mcu_setting_panel.Visible = false;
-
-            mcu_setting_btn.Enabled = true;
-            button_send.Enabled = true;
-            comboBox_cmd.Enabled = true;
-
-        }
 
         private void textBox_threshold_KeyPress(object sender, KeyPressEventArgs e)
         {
@@ -1049,15 +821,6 @@ namespace SerialScreen_ver1
             textBox_pulse_num.Clear();
         }
 
-        private void label_adc_threshold_MouseHover(object sender, EventArgs e)
-        {
-            label_adc_threshold_dis.Visible = true;
-        }
-
-        private void label_adc_threshold_MouseLeave(object sender, EventArgs e)
-        {
-            label_adc_threshold_dis.Visible = false;
-        }
 
         private async void button_mcu_setting_on_Click(object sender, EventArgs e)
         {
@@ -1082,14 +845,6 @@ namespace SerialScreen_ver1
             await Task.Delay(100);
             setting_end_mcu();
 
-            mcu_setting_panel.Enabled = false;
-            mcu_setting_panel.Visible = false;
-
-            mcu_setting_btn.Enabled = true;
-            button_send.Enabled = true;
-            comboBox_cmd.Enabled = true;
-
-
         }
 
         private void button_autoopen_Click(object sender, EventArgs e)
@@ -1097,7 +852,33 @@ namespace SerialScreen_ver1
             MySerialPort sp_ = new MySerialPort(serialPort1);
             AutoSelect comAuto = new AutoSelect("stm32f4", sp_);
 
-            buf_settings(3); //データ受取り数を1000byteに設定(500データ)
+            buf_settings(1000); //データ受取り数を1000byteに設定(500データ)
+
+            button_close.Enabled = true;
+            button_adcStart.Enabled = true;
+            button_adcStop.Enabled = true;
+            button_MCA_ON.Enabled = true;
+            button_MCA_OFF.Enabled = true;
+
+            button_autoopen.Enabled = false;
+
+        }
+
+        private void button_close_Click(object sender, EventArgs e)
+        {
+            serialPort1.Write(adc_stop_code);
+
+            serialPort1.DiscardInBuffer();
+
+            serialPort1.Close();
+
+            button_close.Enabled = false;
+            button_adcStart.Enabled = false;
+            button_adcStop.Enabled = false;
+            button_MCA_ON.Enabled = false;
+            button_MCA_OFF.Enabled = false;
+
+            button_autoopen.Enabled = true;
         }
 
         private void button_adcStart_Click(object sender, EventArgs e)
@@ -1123,5 +904,134 @@ namespace SerialScreen_ver1
                 MessageBox.Show("シリアルポートが開いていません。");
             }
         }
+
+        private void textBox_threshold_MouseHover(object sender, EventArgs e)
+        {
+            label_adc_threshold_dis.Visible = true;
+        }
+
+        private void textBox_threshold_MouseLeave(object sender, EventArgs e)
+        {
+            label_adc_threshold_dis.Visible = false;
+        }
     }
+
+    ////////////////////////////
+    //////////////////////////////
+    ////////いらないコードたち
+    ///
+
+
+
+    //private void button_open_Click(object sender, EventArgs e)
+    //{
+
+    //    b_rate = comboBox_baudrate.SelectedIndex;
+    //    switch (b_rate)
+    //    {
+    //        case (0): b_rate = 115200; break;
+    //        case (1): b_rate = 9600; break;
+    //    }
+
+    //    rx_setting = comboBox_rxsetting.SelectedIndex;
+    //    switch (rx_setting)
+    //    {
+    //        case (0): rx_setting = 0; break;
+    //        case (1): rx_setting = 1; break;
+    //        case (2): rx_setting = 2; break;
+
+    //    }
+
+    //    buf_thresh_setting = comboBox_BufThresh.SelectedIndex;
+    //    switch(buf_thresh_setting)
+    //    {
+    //        case (0):buf_thresh_setting = 1;break;
+    //        case (1): buf_thresh_setting = 200; break;
+    //        case (2): buf_thresh_setting = 500; break;
+    //        case (3): buf_thresh_setting = 1000; break;
+    //        case (4): buf_thresh_setting = 2000;break;
+    //        case (5):buf_thresh_setting = 10000;break;
+    //    }
+
+    //    buf_etc_setting(buf_thresh_setting);
+
+
+    //    serialPort1.BaudRate = b_rate;
+    //    serialPort1.Parity = Parity.None;
+    //    serialPort1.DataBits = 8;
+    //    serialPort1.StopBits = StopBits.One;
+    //    serialPort1.Handshake = Handshake.None;
+    //    serialPort1.PortName = "COM11";
+    //    serialPort1.ReceivedBytesThreshold = buf_thresh_setting;
+    //    serialPort1.Open();
+
+
+    //    //receive_buffer reset
+    //    serialPort1.DiscardInBuffer();
+
+    //    //disable btn or etc
+
+
+    //    btn_rx_buf_clear.Enabled = true;
+    //    btn_rx_buf_clear.Visible = true;
+
+    //    comboBox_baudrate.Enabled = false;
+    //    comboBox_BufThresh.Enabled = false;
+    //    comboBox_rxsetting.Enabled = false;
+
+
+    //}
+
+
+    //private void button3_Click(object sender, EventArgs e)
+    //{
+    //    //string a = comboBox_cmd.SelectedItem.ToString();
+    //    string send_code="B";
+    //    switch (a)
+    //    {
+    //        case "Hello":
+    //            send_code = "E";
+    //                break;
+    //        case "LED_TOGGLE":
+    //            send_code = "B";
+    //            break;
+    //        case "ADC_ON":
+    //            send_code = "C";
+    //            break;
+    //        case "ADC_OFF":
+    //            send_code = "D";
+    //            break;
+    //        case "SINGLE_ADC":
+    //            send_code = "F";
+    //            break;
+    //        case "setting":
+    //            send_code = "G";
+    //            break;
+
+
+
+    //    }
+
+    //    if (serialPort1.IsOpen)
+    //    {
+    //        serialPort1.Write(send_code);
+    //    }
+    //}
+
+    //public void buf_etc_setting(int buf_size)
+    //{
+    //    data_num = buf_size;
+    //    receive_buf = new byte[buf_size];
+    //    if (buf_size % 2 == 0)
+    //    {
+    //        short_buf = new short[buf_size / 2];
+    //    }
+    //}
+
+    //public void mca_result_init(int mca_data_num )
+    //{
+    //    mca_result0 = new int[mca_data_num];
+    //    mca_result1 = new int[mca_data_num];
+    //    mca_result2 = new int[mca_data_num];
+    //}
 }
